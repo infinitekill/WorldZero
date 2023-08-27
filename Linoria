@@ -782,6 +782,15 @@ do
         HideMax = true,
     })
 
+    Farming:AddSlider('LifeStealInterval', {
+        Text = 'Life Steal Repeats',
+        Default = 1,
+        Min = 1,
+        Max = 20,
+        Rounding = 0,
+        HideMax = true,
+    })
+
     Farming:AddToggle('Autofarm', {
         Text = 'Autofarm',
         Default = false, -- Default value (true / false)
@@ -1939,13 +1948,11 @@ Toggles.Killaura:OnChanged(function()
             if not InAtlantis then
                 task.spawn(function()
                     while Toggles.Killaura.Value do
-                        for _, Mob in pairs(Mobs:GetChildren()) do
-                            if Mob:FindFirstChild("HealthProperties") and Mob.HealthProperties.Health.Value > 0 then
-                            --if not Mob:FindFirstChild('Statuses') then
-                                LifeSteal:FireServer(table.create(3, Mob))
-                            --elseif Mob:FindFirstChild('Statuses') and Mob.Statuses:FindFirstChild('Curse') and Mob.Statuses.Curse.RemainingTime.Value < 0.1 then
-                                --LifeSteal:FireServer({Mob})
-                            --end
+                        for i = 1, Options.LifeStealInterval.Value do
+                            for _, Mob in pairs(Mobs:GetChildren()) do
+                                if Mob:FindFirstChild("HealthProperties") and Mob.HealthProperties.Health.Value > 0 then
+                                    LifeSteal:FireServer(table.create(3, Mob))
+                                end
                             end
                         end
                         task.wait()
@@ -1955,18 +1962,21 @@ Toggles.Killaura:OnChanged(function()
             if InAtlantis then
                 task.spawn(function()
                     while not Workspace:FindFirstChild('WaterFolder') and Toggles.Killaura.Value do
-                        for _, Mob in pairs(Mobs:GetChildren()) do
-                            if Mob:FindFirstChild("HealthProperties") and Mob.HealthProperties.Health.Value > 0 then
-                                LifeSteal:FireServer(table.create(3, Mob))
+                        for i = 1, Options.LifeStealInterval.Value do
+                            for _, Mob in pairs(Mobs:GetChildren()) do
+                                if Mob:FindFirstChild("HealthProperties") and Mob.HealthProperties.Health.Value > 0 then
+                                    LifeSteal:FireServer(table.create(3, Mob))
+                                end
                             end
                         end
                         task.wait()
                     end
                     while Workspace:FindFirstChild('WaterFolder') and Toggles.Killaura.Value do
-                        for _, Mob in pairs(Mobs:GetChildren()) do
-                            if Mob:FindFirstChild("HealthProperties") and Mob.HealthProperties.Health.Value > 0
-                            and (Mob.MobProperties.CurrentAttack.Value == 'Piledriver' or Mob.MobProperties.CurrentAttack.Value == 'Slap') then
-                                LifeSteal:FireServer(table.create(3, Mob))
+                        for i = 1, Options.LifeStealInterval.Value do
+                            for _, Mob in pairs(Mobs:GetChildren()) do
+                                if Mob:FindFirstChild("HealthProperties") and Mob.HealthProperties.Health.Value > 0 then
+                                    LifeSteal:FireServer(table.create(3, Mob))
+                                end
                             end
                         end
                         task.wait()
