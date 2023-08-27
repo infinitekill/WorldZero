@@ -1578,7 +1578,7 @@ Toggles.Autofarm:OnChanged(function()
                     end
                 end
                 task.wait(0.2)
-                if (HumanoidRootPart.Position-TowerIdleSpot).magnitude > 50 and not AtlantisBossCheck then
+                if (HumanoidRootPart.Position-TowerIdleSpot).magnitude > 200 and not AtlantisBossCheck then
                     PlayerTp(TowerIdleSpot)
                 end
             end
