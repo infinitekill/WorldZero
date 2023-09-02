@@ -1551,6 +1551,14 @@ do
         end
         
         if InTower then
+            Workspace.ChildAdded:Connect(function(c)
+                if Toggles.Autofarm.Value then
+                    if c.Name == 'RaidChestSilver' then
+                        c.PrimaryPart.CanCollide = false
+                        c.PrimaryPart.CFrame = CFrame.new(HumanoidRootPart.Position)
+                    end
+                end
+            end)
             TowerEnd:GetPropertyChangedSignal("Text"):Once(function()
                 task.spawn(function()
                     while true do
