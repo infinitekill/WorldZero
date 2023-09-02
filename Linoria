@@ -911,7 +911,7 @@ do
                 local drop = items[c.Name]
                 if drop.Type == 'Weapon' or drop.Type == 'Armor' then
                     task.spawn(function()
-                        task.wait(0.5)
+                        task.wait(1)
                         require(game:GetService("ReplicatedStorage").Client.Gui):Get("LootReceived"):_Close()
                         game:GetService("Players").LocalPlayer.PlayerGui.LootReceived.LootReceived.Visible = false
                     end)
@@ -937,7 +937,7 @@ do
             local drop = items[c.Name]
             if drop.Type == 'Weapon' or drop.Type == 'Armor' then
                 task.spawn(function()
-                    task.wait(0.5)
+                    task.wait(1)
                     require(game:GetService("ReplicatedStorage").Client.Gui):Get("LootReceived"):_Close()
                     game:GetService("Players").LocalPlayer.PlayerGui.LootReceived.LootReceived.Visible = false
                 end)
