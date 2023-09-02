@@ -1,3 +1,6 @@
+if game.gameId ~= 985731078 then
+    return
+end
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
@@ -6,6 +9,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild('Shared')
 local TeleportService = game:GetService('TeleportService')
 local SafePart
+local SafeZone
 local Players = game:GetService('Players')
 local LocalPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal('LocalPlayer'):Wait() or Players.LocalPlayer
 local PlayerName = LocalPlayer.Name
@@ -906,6 +910,11 @@ do
             Inventory.ChildAdded:Connect(function(c)
                 local drop = items[c.Name]
                 if drop.Type == 'Weapon' or drop.Type == 'Armor' then
+                    task.spawn(function()
+                        task.wait(0.5)
+                        require(game:GetService("ReplicatedStorage").Client.Gui):Get("LootReceived"):_Close()
+                        game:GetService("Players").LocalPlayer.PlayerGui.LootReceived.LootReceived.Visible = false
+                    end)
                     for i,v in pairs(AutoSellTbl) do
                         if tier:GetItemTier(c) == v then
                             c:WaitForChild('Level')
@@ -927,6 +936,11 @@ do
         Inventory.ChildAdded:Connect(function(c)
             local drop = items[c.Name]
             if drop.Type == 'Weapon' or drop.Type == 'Armor' then
+                task.spawn(function()
+                    task.wait(0.5)
+                    require(game:GetService("ReplicatedStorage").Client.Gui):Get("LootReceived"):_Close()
+                    game:GetService("Players").LocalPlayer.PlayerGui.LootReceived.LootReceived.Visible = false
+                end)
                 for i,v in pairs(AutoSellTbl) do
                     if tier:GetItemTier(c) == v then
                         c:WaitForChild('Level')
@@ -1161,12 +1175,12 @@ do
                 end
                 if MobCount and MobCount ~= MobCountNum then
                     MobCount = MobCountNum
-                    if MobCount == 0 and MissionStarted then
+                    if MobCount == 0 then
                         PlayerTp(HumanoidRootPart.Position, 0, 40, 0)
                     end
                 elseif not MobCount then
                     MobCount = MobCountNum
-                    if MobCount == 0 and MissionStarted then
+                    if MobCount == 0 then
                         PlayerTp(HumanoidRootPart.Position, 0, 40, 0)
                     end
                 end
@@ -1512,6 +1526,69 @@ elseif InTower then
     end)
 end
 
+-- Dungeon fixer
+do
+    if InMission then
+        if MissionScripts:FindFirstChild(6) then
+            task.spawn(function()
+                local Pillar1, Pillar2, Pillar3 = Workspace:WaitForChild('Pillar1'), Workspace:WaitForChild('Pillar2'), Workspace:WaitForChild('Pillar3')
+                Pillar3:WaitForChild('HealthProperties')
+                Pillar1.Parent = Mobs
+                Pillar2.Parent = Mobs
+                Pillar3.Parent = Mobs
+            end)
+        elseif MissionScripts:FindFirstChild(23) then
+            task.spawn(function()
+                Mobs:WaitForChild('BOSSKrakenMain')
+                ChestWait = 4
+                ChestName = 'lol'
+                local AtlantisFolder = Instance.new('Folder')
+                AtlantisFolder.Name = 'WaterFolder'
+                AtlantisFolder.Parent = Workspace
+                Mobs.BOSSKrakenMain.Parent = Workspace.WaterFolder
+                AtlantisBossCheck = true
+            end)
+        end
+        
+        if InTower then
+            TowerEnd:GetPropertyChangedSignal("Text"):Once(function()
+                task.spawn(function()
+                    while true do
+                        for i,v in pairs(Workspace:GetChildren()) do
+                            if v.Name == 'RaidChestSilver' or v.Name == 'RaidChestGold' then
+                                if Toggles.Autofarm.Value then
+                                    v.PrimaryPart.CanCollide = false
+                                    v.PrimaryPart.CFrame = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+                                end
+                            end
+                        end
+                        task.wait()
+                    end
+                end)
+            end)                
+        end
+
+        if InInfiniteTower then
+            SafePart = Instance.new('Part')
+            SafePart.Name = 'SafeZone'
+            SafePart.Size = Vector3.new(20,1,20)
+            SafePart.Position = Vector3.new(0,0,0)
+            SafePart.Anchored = true
+            SafePart.Parent = game.Workspace
+            SafeZone = Workspace.SafeZone
+            Workspace.ChildAdded:Connect(function(c)
+                if Toggles.Autofarm.Value then
+                    if c.Name == 'RaidChestSilver' then
+                        c.PrimaryPart.CanCollide = false
+                        c.PrimaryPart.CFrame = CFrame.new(HumanoidRootPart.Position)
+                    end
+                end
+            end)
+        end
+    end
+end
+
+
 Toggles.Autofarm:OnChanged(function()
     -- Autofarm
     if InDungeon and Toggles.Autofarm.Value then
@@ -1567,9 +1644,11 @@ Toggles.Autofarm:OnChanged(function()
             TowerIdleSpot = MissionObjects.WaveStarter.Position
         end
         if not MissionStarted then
-            local Start = game:GetService("Workspace").MissionObjects:WaitForChild('MissionStart'):WaitForChild('Collider')
-            Start.CFrame = CFrame.new(HumanoidRootPart.Position)
-            task.wait(1)
+            local Start = game:GetService("Workspace").MissionObjects:WaitForChild('MissionStart', 3)
+            if Start then
+                Start.Collider.CFrame = CFrame.new(HumanoidRootPart.Position)
+                task.wait(1)
+            end
         end
         task.spawn(function() 
             while Toggles.Autofarm.Value do
@@ -1694,74 +1773,14 @@ Toggles.Autofarm:OnChanged(function()
                 BossPart.CanCollide = false
                 BossPart.CFrame = CFrame.new(HumanoidRootPart.Position)
                 FloorPart.CFrame = CFrame.new(HumanoidRootPart.Position)
+                if (HumanoidRootPart.Position-SafeZone.Position).magnitude > 100 and TempCheck then
+                    PlayerTp(SafeZone.Position, 0 , 5, 0)
+                end
                 task.wait(0.2)
             end
         end)
-        task.spawn(function()
-        
-        end)
     end
 end)
-
--- Dungeon fixer
-do
-    if InMission then
-        if MissionScripts:FindFirstChild(6) then
-            task.spawn(function()
-                local Pillar1, Pillar2, Pillar3 = Workspace:WaitForChild('Pillar1'), Workspace:WaitForChild('Pillar2'), Workspace:WaitForChild('Pillar3')
-                Pillar3:WaitForChild('HealthProperties')
-                Pillar1.Parent = Mobs
-                Pillar2.Parent = Mobs
-                Pillar3.Parent = Mobs
-            end)
-        elseif MissionScripts:FindFirstChild(23) then
-            task.spawn(function()
-                Mobs:WaitForChild('BOSSKrakenMain')
-                ChestWait = 4
-                ChestName = 'lol'
-                local AtlantisFolder = Instance.new('Folder')
-                AtlantisFolder.Name = 'WaterFolder'
-                AtlantisFolder.Parent = Workspace
-                Mobs.BOSSKrakenMain.Parent = Workspace.WaterFolder
-                AtlantisBossCheck = true
-            end)
-        end
-        
-        if InTower then
-            TowerEnd:GetPropertyChangedSignal("Text"):Once(function()
-                task.spawn(function()
-                    while true do
-                        for i,v in pairs(Workspace:GetChildren()) do
-                            if v.Name == 'RaidChestSilver' or v.Name == 'RaidChestGold' then
-                                if Toggles.Autofarm.Value then
-                                    v.PrimaryPart.CanCollide = false
-                                    v.PrimaryPart.CFrame = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
-                                end
-                            end
-                        end
-                        task.wait()
-                    end
-                end)
-            end)                
-        end
-
-        if InInfiniteTower then
-            SafePart = Instance.new('Part')
-            SafePart.Size = Vector3.new(20,1,20)
-            SafePart.Position = Vector3.new(0,0,0)
-            SafePart.Anchored = true
-            SafePart.Parent = game.Workspace
-            Workspace.ChildAdded:Connect(function(c)
-                if Toggles.Autofarm.Value then
-                    if c.Name == 'RaidChestSilver' then
-                        c.PrimaryPart.CanCollide = false
-                        c.PrimaryPart.CFrame = CFrame.new(HumanoidRootPart.Position)
-                    end
-                end
-            end)
-        end
-    end
-end
 
 -- Killaura Miscellaneous
 do
