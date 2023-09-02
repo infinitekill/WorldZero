@@ -1,0 +1,158 @@
+if game.gameId ~= 985731078 then
+    return
+end
+local function GetPlrInfo(v1)
+    local tbl = game.UserService:GetUserInfosByUserIdsAsync({v1})
+    return tbl[1]
+end
+
+-- Guild Data File stuff
+local GuildData = 'WorldZeroGuildData'
+local Season7 =  GuildData .. '//Season 7'
+local RateLimitFile = GuildData .. '//RateLimit.txt'
+if not isfolder(GuildData) then
+    makefolder(GuildData)
+end
+if not isfolder(Season7) then
+    makefolder(Season7)
+end
+if not isfile(RateLimitFile) then
+    writefile(RateLimitFile, '0')
+end
+local RateLimit = tonumber(readfile(RateLimitFile))
+local function GuildFile(v1) 
+    return Season7 .. '//' .. v1 .. '.txt'
+end
+
+-- Guild list
+local Guilds = {}
+local NewGuilds = {}
+for _, Guild in pairs(game:GetService("TextChatService").TextChannels:GetChildren()) do
+    if not string.find(Guild.Name, "RBX") then
+        if not isfile(GuildFile(Guild.Name)) then
+            table.insert(NewGuilds, Guild.Name) 
+        else
+            table.insert(Guilds, Guild.Name)
+        end
+    end
+end
+
+local function GetGuildInfo(v1,v2)
+    if RateLimit >= 200 then
+        task.wait(60)
+        RateLimit = 0
+        writefile(RateLimitFile, '0')
+    end
+    local tbl = game:GetService("ReplicatedStorage").Shared.Guilds.GetGuildData:InvokeServer(v1)
+    if tbl then
+        local str = "Season: " .. game:GetService("ReplicatedStorage").Shared.Guilds.SeasonData.SeasonID.Value .. "\nSeason Time Left: timenum" ..
+        "\nName: " .. tbl.name .. "\nGuildTag: " .. tbl.id .. "\nLeader: no leader" .. "\nDescription: " .. tbl.desc .. "\nGroupID: none" 
+        local SeasonTimeLeft = game:GetService("ReplicatedStorage").Shared.Guilds.SeasonData.TimeLeft.Value
+        if SeasonTimeLeft == 0 then
+            str = string.gsub(str,'timenum','Ended')
+        else
+            local String = math.floor(SeasonTimeLeft/86400) .. 'd ' .. math.floor(SeasonTimeLeft/3600%24) .. 'h ' .. math.floor(SeasonTimeLeft/60%60) .. 'm'
+            str = string.gsub(str,'timenum',String)
+        end
+        local top = game:GetService("ReplicatedStorage").Shared.Guilds.GetTopGuilds:InvokeServer()
+        local lb = game:GetService("ReplicatedStorage").Shared.Guilds.GetLeaderboard:InvokeServer()
+        local x = "displayname"
+        local y = "username"
+        local profile = "numholder. " .. "rank" .. x .. " (@" .. y .. "): points"
+        local tbl2 = {}
+
+        -- Finds guild leader
+        if type(tbl.leader) == "number" then
+            for i,v in pairs(tbl.users) do
+                if v.id == tbl.leader then
+                    local PlrInfo = GetPlrInfo(v.id)
+                    local newprofile = PlrInfo.DisplayName .. ' (@' .. PlrInfo.Username .. ')'
+                    str = string.gsub(str,"no leader",newprofile)
+                end
+            end
+        end
+
+        -- Checks if groupID exists
+        if type(tbl.groupID) == "number" then
+            str = string.gsub(str,"none",tbl.groupID)
+        end
+
+        -- Checks if guild is in top 5%
+        str = str .."\nTop 5%: false" .. "\nGuildPoints: " .. tbl.points
+        for i,v in pairs(top) do
+            if v[1] == tbl.id then
+                str = string.gsub(str,"false","true")
+            end
+        end
+
+        -- Gets leaderboard position and points
+        for i, v in pairs(lb) do
+            for i2, v2 in pairs(v) do
+                if v2 == tbl.id then
+                    str = str .. "\nLeaderboardPoints: " .. v[2] .. "\nLeaderboardRank: " .. i
+                end
+            end
+        end
+
+        -- Creates and sorts a table for members points
+        str = str .. "\n\nMembersPointList:\n"
+        for i,v in pairs(tbl.users) do
+            if not table.find(tbl2,v.points) then
+                table.insert(tbl2,v.points)
+            end
+        end
+        table.sort(tbl2, function(a, b)
+            return a > b
+        end)
+
+        -- Gets members points and ranks
+        local pnum = 0
+        local pnum2 = 0
+
+        for i,v in pairs(tbl2) do
+            for i2,v2 in pairs(tbl.users) do
+                if v2.points == v then
+                    pnum += 1
+                    local newprofile = profile
+                    newprofile = string.gsub(newprofile,x,v2.id)
+                    newprofile = string.gsub(newprofile,y,v2.id)
+                    newprofile = string.gsub(newprofile,"numholder",pnum)
+                    newprofile = string.gsub(newprofile,"points",v2.points)
+                    if v2.permission == 3 then
+                        newprofile = string.gsub(newprofile,"rank",'(CAPTAIN) ')
+                    elseif v2.permission == 2 then
+                        newprofile = string.gsub(newprofile,"rank",'(ELITE) ')
+                    elseif v2.permission == 1 then
+                        newprofile = string.gsub(newprofile,"rank",'(LEADER) ')
+                    else
+                        newprofile = string.gsub(newprofile,"rank",'')
+                    end
+                    str = str .. "\n" .. "\t" .. newprofile
+                end
+            end
+        end
+        for i,v in pairs(tbl.users) do
+            task.spawn(function()
+                RateLimit += 1
+                local PlrInfo = GetPlrInfo(v.id)
+                str = string.gsub(str, '@' .. v.id,'@' ..  PlrInfo.Username)
+                str = string.gsub(str, v.id, PlrInfo.DisplayName)
+                pnum2 += 1
+            end)
+        end
+        repeat wait() until pnum2 == pnum
+        writefile(RateLimitFile, tostring(RateLimit))
+        writefile(GuildFile(v1), str)
+        print(v1 .. ' Data ' .. v2)
+    end
+end
+
+for _, guildName in pairs(NewGuilds) do
+    GetGuildInfo(guildName,'Created')
+end
+for _, guildName in pairs(Guilds) do
+    GetGuildInfo(guildName,'Overwritten')
+end
+task.wait(60)
+RateLimit = 0
+writefile(RateLimitFile, '0')
