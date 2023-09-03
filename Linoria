@@ -117,6 +117,7 @@ local Characters = game:GetService("Workspace"):WaitForChild("Characters")
 local Class1 = Profile:WaitForChild("Class")
 local Class = Class1.Value
 local GetMissionChest = Shared.Missions.GetMissionPrize
+local Equipment = Character.Equipment
 local Skillsets = Shared:WaitForChild('Combat'):WaitForChild('Skillsets')
 local RangedClassRange = 60
 local MeleeClassRange = 18
@@ -161,6 +162,7 @@ LocalPlayer.CharacterAdded:Connect(function(NewCharacter)
     Character = NewCharacter
     HumanoidRootPart = Character:WaitForChild('HumanoidRootPart')
     HealthProperties = Character:WaitForChild('HealthProperties')
+    Equipment = Character:WaitForChild('Equipment')
 end)
 Shared.Missions.MissionStart.OnClientEvent:Once(function()
     MissionStarted = true
@@ -962,6 +964,8 @@ do
     function SmartPlayerTp(v1, x, y, z)
         HumanoidRootPart.CFrame = v1.CFrame + (v1.CFrame.lookVector*(x)+v1.CFrame.upVector*(y)+v1.CFrame.rightVector*(z))
         HumanoidRootPart.CFrame = CFrame.lookAt(HumanoidRootPart.Position, v1.Position)
+        --HumanoidRootPart.CFrame = CFrame.new(v1.Position + (v1.CFrame.lookVector*(x)+v1.CFrame.upVector*(y)+v1.CFrame.rightVector*(z)),
+        --Vector3.new(v1.Position.x, HumanoidRootPart.Position.y, v1.Position.z))
     end
 
     Miscellaneous:AddToggle('NVD', {
@@ -973,15 +977,17 @@ do
         Text = 'Upgrade Equipped Items',
         Func = function()
             for _, Item in pairs(Equip:GetDescendants()) do
-                if Item:FindFirstChild('UpgradeLimit') and Item.UpgradeLimit.Value ~= 0 then
-                    while task.wait(0.1) do
-                        if Item:FindFirstChild('Upgrade') and Item.Upgrade.Value == Item.UpgradeLimit.Value then
-                            break
-                        else
-                           Upgrade:FireServer(Item) 
+                task.spawn(function()
+                    if Item:FindFirstChild('UpgradeLimit') and Item.UpgradeLimit.Value ~= 0 then
+                        while task.wait(0.1) do
+                            if Item:FindFirstChild('Upgrade') and Item.Upgrade.Value == Item.UpgradeLimit.Value then
+                                break
+                            else
+                            Upgrade:FireServer(Item) 
+                            end
                         end
                     end
-                end
+                end)
             end
         end,
         DoubleClick = false
@@ -1200,9 +1206,10 @@ end
 
 -- Change Cosmetic 
 do
-    local Equipment = game:GetService("Workspace").Characters[PlayerName].Equipment
     local function ChangeCosmetic(v1,v2)
-        Equipment:SetAttribute(v1,v2)
+        if Character then
+            Equipment:SetAttribute(v1,v2)
+        end
     end
     local function color(x,y,z)
         Color3.fromRGB(x,y,z)
@@ -1235,260 +1242,62 @@ do
         Hat3Dye = "Hat3Dye",
         Mount = "Mount"
     }
+
+    local CogWork = {
+        Costume = "CogWorkArmor",
+        Hat1 = "CogWorkTophat",
+        Hat2 = "CogWorkGoggles",
+    }
     
     -- Platemails
     do
-        function GreenPlatemail()
-            ChangeCosmetic(Equip.Costume, "FullPlatemail")
-            ChangeCosmetic(Equip.CostumeDye, Colors.Green)
+        --function GreenPlatemail()
+        --    ChangeCosmetic(Equip.Costume, "FullPlatemail")
+        --    ChangeCosmetic(Equip.CostumeDye, Colors.Green)
     
-            ChangeCosmetic(Equip.LeftAura, "PoisonBreathAura")
-            ChangeCosmetic(Equip.RightAura, "PoisonBreathAura")
+        --    ChangeCosmetic(Equip.LeftAura, "PoisonBreathAura")
+        --   ChangeCosmetic(Equip.RightAura, "PoisonBreathAura")
     
-            ChangeCosmetic(Equip.LeftWepSkin, "GalacticLongswordGreen")
-            ChangeCosmetic(Equip.RightWepSkin, "GalacticLongswordGreen")
+        --    ChangeCosmetic(Equip.LeftWepSkin, "GalacticLongswordGreen")
+        --    ChangeCosmetic(Equip.RightWepSkin, "GalacticLongswordGreen")
     
-            ChangeCosmetic(Equip.Hat1, "FullPlatemailHelm")
-            ChangeCosmetic(Equip.Hat1Dye, Colors.Green)
+        --    ChangeCosmetic(Equip.Hat1, "FullPlatemailHelm")
+        --    ChangeCosmetic(Equip.Hat1Dye, Colors.Green)
     
-            ChangeCosmetic(Equip.Back, "AngelWings")
-            ChangeCosmetic(Equip.BackDye, Colors.Green)
-        end
-    
-        function RedPlatemail()
-            ChangeCosmetic(Equip.Costume, "FullPlatemail")
-            ChangeCosmetic(Equip.CostumeDye, Colors.Red)
-    
-            ChangeCosmetic(Equip.LeftAura, "ScarletAura")
-            ChangeCosmetic(Equip.RightAura, "ScarletAura")
-    
-            ChangeCosmetic(Equip.LeftWepSkin, "GalacticLongswordRed")
-            ChangeCosmetic(Equip.RightWepSkin, "GalacticLongswordRed")
-    
-            ChangeCosmetic(Equip.Hat1, "FullPlatemailHelm")
-            ChangeCosmetic(Equip.Hat1Dye, Colors.Red)
-    
-            ChangeCosmetic(Equip.Back, "AngelWings")
-            ChangeCosmetic(Equip.BackDye, Colors.Red)
-        end
-    
-        function PinkPlatemail()
-            ChangeCosmetic(Equip.Costume, "FullPlatemail")
-            ChangeCosmetic(Equip.CostumeDye, Colors.Pink)
-    
-            ChangeCosmetic(Equip.LeftAura, "AetherBreathAura")
-            ChangeCosmetic(Equip.RightAura, "AetherBreathAura")
-    
-            ChangeCosmetic(Equip.LeftWepSkin, "NiteLongswordPink")
-            ChangeCosmetic(Equip.RightWepSkin, "NiteLongswordPink")
-    
-            ChangeCosmetic(Equip.Hat1, "FullPlatemailHelm")
-            ChangeCosmetic(Equip.Hat1Dye, Colors.Pink)
-    
-            ChangeCosmetic(Equip.Back, "AngelWings")
-            ChangeCosmetic(Equip.BackDye, Colors.Pink)
-        end
-    
-        function CyanPlatemail()
-            ChangeCosmetic(Equip.Costume, "FullPlatemail")
-            ChangeCosmetic(Equip.CostumeDye, Colors.Cyan)
-    
-            ChangeCosmetic(Equip.LeftAura, "FrostBreathAura")
-            ChangeCosmetic(Equip.RightAura, "FrostBreathAura")
-    
-            ChangeCosmetic(Equip.LeftWepSkin, "GalacticLongswordBlue")
-            ChangeCosmetic(Equip.RightWepSkin, "GalacticLongswordBlue")
-    
-            ChangeCosmetic(Equip.Hat1, "FullPlatemailHelm")
-            ChangeCosmetic(Equip.Hat1Dye, Colors.Cyan)
-    
-            ChangeCosmetic(Equip.Back, "AngelWings")
-            ChangeCosmetic(Equip.BackDye, Colors.Cyan)
-        end
-    
-        function OrangePlatemail()
-            ChangeCosmetic(Equip.Costume, "FullPlatemail")
-            ChangeCosmetic(Equip.CostumeDye, Colors.Orange)
-    
-            ChangeCosmetic(Equip.LeftAura, "FireBreathAura")
-            ChangeCosmetic(Equip.RightAura, "FireBreathAura")
-    
-            ChangeCosmetic(Equip.LeftWepSkin, "NiteLongswordOrange")
-            ChangeCosmetic(Equip.RightWepSkin, "NiteLongswordOrange")
-    
-            ChangeCosmetic(Equip.Hat1, "FullPlatemailHelm")
-            ChangeCosmetic(Equip.Hat1Dye, Colors.Orange)
-    
-            ChangeCosmetic(Equip.Back, "AngelWings")
-            ChangeCosmetic(Equip.BackDye, Colors.Orange)
-        end
-    
-        function LightPinkPlatemail()
-            ChangeCosmetic(Equip.Costume, "FullPlatemail")
-            ChangeCosmetic(Equip.CostumeDye, Colors.LightPink)
-    
-            ChangeCosmetic(Equip.LeftAura, "BunnyFluffAura")
-            ChangeCosmetic(Equip.RightAura, "BunnyFluffAura")
-    
-            ChangeCosmetic(Equip.LeftWepSkin, "NiteLongswordPink")
-            ChangeCosmetic(Equip.RightWepSkin, "NiteLongswordPink")
-    
-            ChangeCosmetic(Equip.Hat1, "FullPlatemailHelm")
-            ChangeCosmetic(Equip.Hat1Dye, Colors.LightPink)
-    
-            ChangeCosmetic(Equip.Back, "AngelWings")
-            ChangeCosmetic(Equip.BackDye, Colors.LightPink)
-        end
-    
-        function BlackRedPlatemail()
-            ChangeCosmetic(Equip.Costume, "FullPlatemail")
-            ChangeCosmetic(Equip.CostumeDye, Colors.Black)
-    
-            ChangeCosmetic(Equip.LeftAura, "ScarletAura")
-            ChangeCosmetic(Equip.RightAura, "ScarletAura")
-    
-            ChangeCosmetic(Equip.LeftWepSkin, "GalacticLongswordRed")
-            ChangeCosmetic(Equip.RightWepSkin, "GalacticLongswordRed")
-    
-            ChangeCosmetic(Equip.Hat1, "FullPlatemailHelm")
-            ChangeCosmetic(Equip.Hat1Dye, Colors.Black)
-    
-            ChangeCosmetic(Equip.Back, "AngelWings")
-            ChangeCosmetic(Equip.BackDye, Colors.Black)
-        end
-    
-        function SupernovaPlatemail()
-            ChangeCosmetic(Equip.Costume, "FullPlatemail")
-            ChangeCosmetic(Equip.CostumeDye, Colors.Cyan)
-    
-            ChangeCosmetic(Equip.LeftAura, "SupernovaAura")
-            ChangeCosmetic(Equip.RightAura, "SupernovaAura")
-    
-            ChangeCosmetic(Equip.LeftWepSkin, "GalacticLongswordBlue")
-            ChangeCosmetic(Equip.RightWepSkin, "GalacticLongswordBlue")
-    
-            ChangeCosmetic(Equip.Hat1, "FullPlatemailHelm")
-            ChangeCosmetic(Equip.Hat1Dye, Colors.Cyan)
-    
-            ChangeCosmetic(Equip.Back, "AngelWings")
-            ChangeCosmetic(Equip.BackDye, Colors.White)
-        end
-    
-        function BlackBlueRedPlatemail()
-            ChangeCosmetic(Equip.Costume, "FullPlatemail")
-            ChangeCosmetic(Equip.CostumeDye, Colors.Black)
-    
-            ChangeCosmetic(Equip.LeftAura, "ScarletAura")
-            ChangeCosmetic(Equip.RightAura, "FrostBreathAura")
-    
-            ChangeCosmetic(Equip.LeftWepSkin, "GalacticLongswordRed")
-            ChangeCosmetic(Equip.RightWepSkin, "GalacticLongswordBlue")
-    
-            ChangeCosmetic(Equip.Hat1, "FullPlatemailHelm")
-            ChangeCosmetic(Equip.Hat1Dye, Colors.Black)
-    
-            ChangeCosmetic(Equip.Back, "AngelWings")
-            ChangeCosmetic(Equip.BackDye, Colors.Black)
+        --    ChangeCosmetic(Equip.Back, "AngelWings") 
+        --    ChangeCosmetic(Equip.BackDye, Colors.Green)
+        --end
+        
+        function CogWorkOutfit()
+            if Equipment:GetAttribute('Primary') then
+                local WeaponType = items[Equipment:GetAttribute('Primary')].SubType
+                if WeaponType == 'Greataxe' then
+                    ChangeCosmetic(Equip.RightWepSkin, 'CogWorkAxe')
+                else
+                    ChangeCosmetic(Equip.RightWepSkin, 'CogWork' .. WeaponType)               
+                end
+            end
+            if Equipment:GetAttribute('Offhand') then
+                local WeaponType = items[Equipment:GetAttribute('Offhand')].SubType
+                if WeaponType == 'Greataxe' then
+                    ChangeCosmetic(Equip.LeftWepSkin, 'CogWorkAxe')
+                else
+                    ChangeCosmetic(Equip.LeftWepSkin, 'CogWork' .. WeaponType)               
+                end
+            end
+            for i,v in pairs(CogWork) do
+                ChangeCosmetic(i,v)
+            end
         end
     end
 
     -- Cosmetic Buttons
     do
-        local CyanPlatemail = OutfitList:AddButton({
-            Text = 'Cyan Platemail',
+        local CogWorkButton = OutfitList:AddButton({
+            Text = 'Cogwork',
             Func = function()
                 if Character then
-                    CyanPlatemail()
-                end
-            end,
-            DoubleClick = false
-        })
-
-        local RedPlatemail = OutfitList:AddButton({
-            Text = 'Red Platemail',
-            Func = function()
-                if Character then
-                    RedPlatemail()
-                end
-            end,
-            DoubleClick = false
-        })
-
-        local GreenPlatemail = OutfitList:AddButton({
-            Text = 'Green Platemail',
-            Func = function()
-                if Character then
-                    GreenPlatemail()
-                end
-            end,
-            DoubleClick = false
-        })
-
-        local BlackPlatemail = OutfitList:AddButton({
-            Text = 'Black Platemail',
-            Func = function()
-                if Character then
-                    BlackPlatemail()
-                end
-            end,
-            DoubleClick = false
-        })
-
-        local OrangePlatemail = OutfitList:AddButton({
-            Text = 'Orange Platemail',
-            Func = function()
-                if Character then
-                    OrangePlatemail()
-                end
-            end,
-            DoubleClick = false
-        })
-
-        local PinkPlatemail = OutfitList:AddButton({
-            Text = 'Pink Platemail',
-            Func = function()
-                if Character then
-                    PinkPlatemail()
-                end
-            end,
-            DoubleClick = false
-        })
-
-        local LightPinkPlatemail = OutfitList:AddButton({
-            Text = 'Light Pink Platemail',
-            Func = function()
-                if Character then
-                    LightPinkPlatemail()
-                end
-            end,
-            DoubleClick = false
-        })
-
-        local SupernovaPlatemail = OutfitList:AddButton({
-            Text = 'Supernova Platemail',
-            Func = function()
-                if Character then
-                    SupernovaPlatemail()
-                end
-            end,
-            DoubleClick = false
-        })
-
-        local BlackRedPlatemail = OutfitList:AddButton({
-            Text = 'Black/Red Platemail',
-            Func = function()
-                if Character then
-                    BlackRedPlatemail()
-                end
-            end,
-            DoubleClick = false
-        })
-
-        local BlackBlueRedPlatemail = OutfitList:AddButton({
-            Text = 'Black/Blue/Red Platemail',
-            Func = function()
-                if Character then
-                    BlackBlueRedPlatemail()
+                    CogWorkOutfit()
                 end
             end,
             DoubleClick = false
