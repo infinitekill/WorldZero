@@ -1,0 +1,83 @@
+local ReplicatedStorage = game:GetService('ReplicatedStorage')
+local Shared = ReplicatedStorage.Shared
+local Players = game:GetService('Players')
+local LocalPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal('LocalPlayer'):Wait() or Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait() or LocalPlayer.Character
+local HumanoidRootPart = Character:WaitForChild('HumanoidRootPart')
+local Skillsets = Shared:WaitForChild('Combat'):WaitForChild('Skillsets')
+local LifeSteal = Skillsets.Demon.LifeSteal
+local CoinEvent = Shared:WaitForChild('Drops'):WaitForChild('CoinEvent')
+local Settings = require(Shared:WaitForChild('Settings'))
+local CoinTable = debug.getupvalue(require(Shared.Drops).Start, 4)
+local Mobs = Workspace.Mobs
+local InTower = false
+local InInfiniteTower = false
+local Towers = {21,23,27,29,34}
+local GetMissionChest = Shared.Missions.GetMissionPrize
+local MissionObjects = game:GetService("Workspace").MissionObjects
+local DungeonID = ReplicatedStorage:WaitForChild("ActiveMission").Value
+local InAtlantis = false
+local MissionScripts = game.ReplicatedStorage:WaitForChild("MissionScripts")
+if DungeonID == 23 then
+    InAtlantis = true
+    InTower = true
+elseif DungeonID == 38 or DungeonID == 39 then
+    InInfiniteTower = true
+elseif table.find(Towers, DungeonID) then
+    InTower = true
+end
+local f = require(game.ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Effects"))
+local DmgNum = f.RenderDamageNumber
+f.RenderDamageNumber = function(...)
+    if true then
+        return
+    end
+    return DmgNum(...)
+end
+Settings.SPRINT_WALKSPEED = 125
+--Mobs.ChildAdded:Connect(function(Mob)
+ --   while Mob.HealthProperties.Health.Value > 0 do
+ --       LifeSteal:FireServer(table.create(3, Mob))
+ --       task.wait()
+ --   end
+--end)
+if DungeonID then
+    task.spawn(function()
+        while true do
+            for _, Mob in pairs(Mobs:GetChildren()) do
+                if Mob:FindFirstChild("HealthProperties") and Mob.HealthProperties.Health.Value > 0 then
+                --if not Mob:FindFirstChild('Statuses') then
+                    LifeSteal:FireServer(table.create(3, Mob))
+                --elseif Mob:FindFirstChild('Statuses') and Mob.Statuses:FindFirstChild('Curse') and Mob.Statuses.Curse.RemainingTime.Value < 0.1 then
+                    --LifeSteal:FireServer({Mob})
+                --end
+                end
+            end
+            task.wait()
+        end
+    end)
+end
+task.spawn(function()
+    while true do
+        for Index, Coin in pairs(CoinTable) do
+            Coin.model:Destroy()
+            Coin.followPart:Destroy()
+            table.remove(CoinTable, Index)
+            CoinEvent:FireServer(Coin.id)
+        end
+        task.wait()
+    end
+end)
+
+Shared.Missions.MissionFinished.OnClientEvent:Once(function()
+    GetMissionChest:InvokeServer()
+    GetMissionChest:InvokeServer()
+    GetMissionChest:InvokeServer()
+    GetMissionChest:InvokeServer()
+    task.wait(1)
+    Shared:WaitForChild('Teleport'):WaitForChild('StartRaid'):FireServer(DungeonID)
+end)
+local Start = game:GetService("Workspace").MissionObjects:WaitForChild('MissionStart', 3)
+if Start then
+    HumanoidRootPart.CFrame = CFrame.new(Start.PrimaryPart.Position)
+end
