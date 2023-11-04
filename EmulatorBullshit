@@ -91,3 +91,10 @@ local Start = game:GetService("Workspace").MissionObjects:WaitForChild('MissionS
 if Start then
     HumanoidRootPart.CFrame = CFrame.new(Start.PrimaryPart.Position)
 end
+if DungeonID == 22 then
+local b = workspace:WaitForChild("CureFountainFallenKing")
+local OldPos = HumanoidRootPart.Position
+HumanoidRootPart.CFrame = CFrame.new(b.PrimaryPart.Position)
+task.wait(3)
+HumanoidRootPart.CFrame = CFrame.new(OldPos)
+end
