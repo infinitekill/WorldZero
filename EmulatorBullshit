@@ -109,6 +109,7 @@ task.spawn(function()
    if     workspace:FindFirstChild('CureFountainFallenKing') and Fountain == nil then
    Fountain = true
    local count = 0
+   print('Teleporting to cure')
    while task.wait(0.1) do
    count += 1
    HumanoidRootPart.CFrame = CFrame.new(workspace.CureFountainFallenKing.PrimaryPart.Position)
