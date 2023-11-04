@@ -96,14 +96,14 @@ task.spawn(function()
  local ArenaEntry = MissionObjects:WaitForChild('ArenaEntry0')
  ArenaEntry.Anchored = true
  ArenaEntry.CanCollide = false
- while task.wait() do
+ task.wait(7)
 if not workspace:FindFirstChild('CureFountainFallenKing') then
   ArenaEntry.CFrame = CFrame.new(HumanoidRootPart.Position)
 end
   task.wait(1)
   ArenaEntry.CFrame = CFrame.new(Vector3.new(0,0,0))
   task.wait(1)
-  end
+  
 end)
 local b = workspace:WaitForChild("CureFountainFallenKing")
 local OldPos = HumanoidRootPart.Position
