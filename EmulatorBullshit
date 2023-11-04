@@ -4,6 +4,7 @@ end
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
+print('Version 1 (EmulatorBullshit)')
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
 local Shared = ReplicatedStorage.Shared
 local Players = game:GetService('Players')
@@ -99,22 +100,27 @@ task.spawn(function()
  local ArenaEntry = MissionObjects:WaitForChild('ArenaEntry0')
  ArenaEntry.Anchored = true
  ArenaEntry.CanCollide = false
- task.wait(9)
+ 
 
-  ArenaEntry.CFrame = CFrame.new(HumanoidRootPart.Position)
+  
 
- task.spawn(function()
-  task.wait(2)
-  ArenaEntry.CFrame = CFrame.new(Vector3.new(0,0,0))
-  end)
+ 
   while task.wait() do
-   if     workspace:FindFirstChild('CureFountainFallenKing') and not Fountain then
+   if     workspace:FindFirstChild('CureFountainFallenKing') and Fountain == nil then
    print('cure appeared')
    Fountain = true
+   local count = 0
+   while task.wait(0.1) do
+   count += 1
    HumanoidRootPart.CFrame = CFrame.new(workspace.CureFountainFallenKing.PrimaryPart.Position)
-   task.wait(3)
-   elseif (OldPos-HumanoidRootPart.Position).magnitude > 50 then
-   HumanoidRootPart.CFrame = CFrame.new(OldPos)
+   if count == 30 then
+   break end
+   end
+   else
+   ArenaEntry.CFrame = CFrame.new(HumanoidRootPart.Position)
+   task.wait(0.5)
+  ArenaEntry.CFrame = CFrame.new(Vector3.new(0,0,0))
+  task.wait(0.5)
   end
   
   end
