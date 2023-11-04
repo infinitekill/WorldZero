@@ -95,6 +95,7 @@ if DungeonID == 22 then
 local b = workspace:WaitForChild("CureFountainFallenKing")
 local OldPos = HumanoidRootPart.Position
 HumanoidRootPart.CFrame = CFrame.new(b.PrimaryPart.Position)
+print('Teleported to Cure')
 task.wait(3)
 HumanoidRootPart.CFrame = CFrame.new(OldPos)
 end
