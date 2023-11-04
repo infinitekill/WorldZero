@@ -92,6 +92,17 @@ if Start then
     HumanoidRootPart.CFrame = CFrame.new(Start.PrimaryPart.Position)
 end
 if DungeonID == 22 then
+task.spawn(function()
+ local ArenaEntry = MissionObjects:WaitForChild('ArenaEntry0')
+ ArenaEntry.Anchored = true
+ ArenaEntry.CanCollide = false
+ while task.wait() do
+  ArenaEntry.CFrame = CFrame.new(HumanoidRootPart.Position)
+  task.wait(1)
+  ArenaEntry.CFrame = CFrame.new(Vector3.new(0,0,0))
+  task.wait(1)
+  end
+end)
 local b = workspace:WaitForChild("CureFountainFallenKing")
 local OldPos = HumanoidRootPart.Position
 HumanoidRootPart.CFrame = CFrame.new(b.PrimaryPart.Position)
