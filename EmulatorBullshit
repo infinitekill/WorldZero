@@ -25,8 +25,8 @@ local InInfiniteTower = false
 local Towers = {21,23,27,29,34}
 local GetMissionChest = Shared.Missions.GetMissionPrize
 local MissionObjects = game:GetService("Workspace").MissionObjects
-local DungeonID = ReplicatedStorage:WaitForChild("ActiveMission").Value
-local InAtlantis = false
+local DungeonID = ReplicatedStorage:WaitForChild("ActiveMission",30).Value
+local DifficultyID = Shared.Missions.GetDifficulty:InvokeServe()local InAtlantis = false
 local MissionScripts = game.ReplicatedStorage:WaitForChild("MissionScripts")
 if DungeonID == 23 then
     InAtlantis = true
@@ -85,7 +85,7 @@ Shared.Missions.MissionFinished.OnClientEvent:Once(function()
     GetMissionChest:InvokeServer()
     GetMissionChest:InvokeServer()
     task.wait(1)
-    Shared:WaitForChild('Teleport'):WaitForChild('StartRaid'):FireServer(DungeonID)
+    Shared:WaitForChild('Teleport'):WaitForChild('StartRaid'):FireServer(DungeonID, DifficultyID)
 end)
 local Start = game:GetService("Workspace").MissionObjects:WaitForChild('MissionStart', 3)
 if Start then
