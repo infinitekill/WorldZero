@@ -107,7 +107,6 @@ task.spawn(function()
  
   while task.wait() do
    if     workspace:FindFirstChild('CureFountainFallenKing') and Fountain == nil then
-   print('cure appeared')
    Fountain = true
    local count = 0
    while task.wait(0.1) do
