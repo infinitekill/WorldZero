@@ -26,7 +26,7 @@ local Towers = {21,23,27,29,34}
 local GetMissionChest = Shared.Missions.GetMissionPrize
 local MissionObjects = game:GetService("Workspace").MissionObjects
 local DungeonID = ReplicatedStorage:WaitForChild("ActiveMission",30).Value
-local DifficultyID = Shared.Missions.GetDifficulty:InvokeServe()local InAtlantis = false
+local DifficultyID = Shared.Missions.GetDifficulty:InvokeServer()local InAtlantis = false
 local MissionScripts = game.ReplicatedStorage:WaitForChild("MissionScripts")
 if DungeonID == 23 then
     InAtlantis = true
