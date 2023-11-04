@@ -88,11 +88,14 @@ Shared.Missions.MissionFinished.OnClientEvent:Once(function()
     Shared:WaitForChild('Teleport'):WaitForChild('StartRaid'):FireServer(DungeonID, DifficultyID)
 end)
 local Start = game:GetService("Workspace").MissionObjects:WaitForChild('MissionStart', 3)
+local OldPos
 if Start then
+    OldPos = HumanoidRootPart.Position
     HumanoidRootPart.CFrame = CFrame.new(Start.PrimaryPart.Position)
 end
 if DungeonID == 22 then
 task.spawn(function()
+ local Fountain 
  local ArenaEntry = MissionObjects:WaitForChild('ArenaEntry0')
  ArenaEntry.Anchored = true
  ArenaEntry.CanCollide = false
@@ -100,13 +103,23 @@ task.spawn(function()
 if not workspace:FindFirstChild('CureFountainFallenKing') then
   ArenaEntry.CFrame = CFrame.new(HumanoidRootPart.Position)
 end
-  task.wait(1)
+ task.spawn(function()
+  task.wait(2)
   ArenaEntry.CFrame = CFrame.new(Vector3.new(0,0,0))
-  task.wait(1)
+  end)
+  while task.wait() do
+   if     workspace:FindFirstChild('CureFountainFallenKing') and not Fountain then
+   Fountain = true
+   HumanoidRootPart.CFrame = CFrame.new(workspace.CureFountainFallenKing.PrimaryPart.Position)
+   task.wait(3)
+   elseif (OldPos-HumanoidRootPart.Position).magnitude > 50 then
+   HumanoidRootPart.CFrame = CFrame.new(OldPos)
+  end
+  
+  end
   
 end)
 local b = workspace:WaitForChild("CureFountainFallenKing")
-local OldPos = HumanoidRootPart.Position
 HumanoidRootPart.CFrame = CFrame.new(b.PrimaryPart.Position)
 print('Teleported to Cure')
 task.wait(3)
