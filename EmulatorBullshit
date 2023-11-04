@@ -99,16 +99,17 @@ task.spawn(function()
  local ArenaEntry = MissionObjects:WaitForChild('ArenaEntry0')
  ArenaEntry.Anchored = true
  ArenaEntry.CanCollide = false
- task.wait(7)
-if not workspace:FindFirstChild('CureFountainFallenKing') then
+ task.wait(9)
+
   ArenaEntry.CFrame = CFrame.new(HumanoidRootPart.Position)
-end
+
  task.spawn(function()
   task.wait(2)
   ArenaEntry.CFrame = CFrame.new(Vector3.new(0,0,0))
   end)
   while task.wait() do
    if     workspace:FindFirstChild('CureFountainFallenKing') and not Fountain then
+   print('cure appeared')
    Fountain = true
    HumanoidRootPart.CFrame = CFrame.new(workspace.CureFountainFallenKing.PrimaryPart.Position)
    task.wait(3)
@@ -119,9 +120,4 @@ end
   end
   
 end)
-local b = workspace:WaitForChild("CureFountainFallenKing")
-HumanoidRootPart.CFrame = CFrame.new(b.PrimaryPart.Position)
-print('Teleported to Cure')
-task.wait(3)
-HumanoidRootPart.CFrame = CFrame.new(OldPos)
 end
