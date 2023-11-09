@@ -4,7 +4,7 @@ end
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
-print('Version 2 (EmulatorBullshit)')
+print('Version 3 (EmulatorBullshit)')
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
 local Shared = ReplicatedStorage.Shared
 local Players = game:GetService('Players')
@@ -26,7 +26,7 @@ local InInfiniteTower = false
 local Towers = {21,23,27,29,34}
 local GetMissionChest = Shared.Missions.GetMissionPrize
 local MissionObjects = game:GetService("Workspace").MissionObjects
-local DungeonID = ReplicatedStorage:WaitForChild("ActiveMission",30).Value
+local DungeonID = ReplicatedStorage:WaitForChild("ActiveMission",60).Value
 local DifficultyID = Shared.Missions.GetDifficulty:InvokeServer()local InAtlantis = false
 local MissionScripts = game.ReplicatedStorage:WaitForChild("MissionScripts")
 if DungeonID == 23 then
@@ -88,7 +88,7 @@ Shared.Missions.MissionFinished.OnClientEvent:Once(function()
     task.wait(1)
     Shared:WaitForChild('Teleport'):WaitForChild('StartRaid'):FireServer(DungeonID, DifficultyID)
 end)
-local Start = game:GetService("Workspace").MissionObjects:WaitForChild('MissionStart', 20)
+local Start = game:GetService("Workspace").MissionObjects:WaitForChild('MissionStart', 60)
 local OldPos
 if Start then
     OldPos = HumanoidRootPart.Position
