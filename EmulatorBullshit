@@ -4,7 +4,7 @@ end
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
-print('Version 4 (EmulatorBullshit)')
+print('Version 5 (EmulatorBullshit)')
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
 local Shared = ReplicatedStorage.Shared
 local Players = game:GetService('Players')
