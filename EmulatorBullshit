@@ -27,6 +27,7 @@ local Towers = {21,23,27,29,34}
 local GetMissionChest = Shared.Missions.GetMissionPrize
 local MissionObjects = game:GetService("Workspace").MissionObjects
 local DungeonID = ReplicatedStorage:WaitForChild("ActiveMission",150).Value
+print('Checkpoint 1')
 local DifficultyID = Shared.Missions.GetDifficulty:InvokeServer()local InAtlantis = false
 local MissionScripts = game.ReplicatedStorage:WaitForChild("MissionScripts")
 if DungeonID == 23 then
@@ -88,10 +89,11 @@ Shared.Missions.MissionFinished.OnClientEvent:Once(function()
     task.wait(1)
     Shared:WaitForChild('Teleport'):WaitForChild('StartRaid'):FireServer(DungeonID, DifficultyID)
 end)
-
+print('Checkpoint 2')
 local Start = game:GetService("Workspace").MissionObjects:WaitForChild('MissionStart', 120)
 local OldPos
 if Start then
+    print('Checkpoint 3 (Final)')
     OldPos = HumanoidRootPart.Position
     HumanoidRootPart.CFrame = CFrame.new(Start.PrimaryPart.Position)
 end
