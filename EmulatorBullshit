@@ -4,7 +4,7 @@ end
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
-print('Version 5 (EmulatorBullshit)')
+print('Version 6 (EmulatorBullshit)')
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
 local Shared = ReplicatedStorage.Shared
 local Players = game:GetService('Players')
@@ -27,7 +27,6 @@ local Towers = {21,23,27,29,34}
 local GetMissionChest = Shared.Missions.GetMissionPrize
 local MissionObjects = game:GetService("Workspace").MissionObjects
 local DungeonID = ReplicatedStorage:WaitForChild("ActiveMission",150).Value
-print('Checkpoint 1')
 local DifficultyID = Shared.Missions.GetDifficulty:InvokeServer()local InAtlantis = false
 local MissionScripts = game.ReplicatedStorage:WaitForChild("MissionScripts")
 if DungeonID == 23 then
@@ -68,18 +67,19 @@ if DungeonID then
             task.wait()
         end
     end)
-end
-task.spawn(function()
-    while true do
-        for Index, Coin in pairs(CoinTable) do
-            Coin.model:Destroy()
-            Coin.followPart:Destroy()
-            table.remove(CoinTable, Index)
-            CoinEvent:FireServer(Coin.id)
+    task.spawn(function()
+        while true do
+            for Index, Coin in pairs(CoinTable) do
+                Coin.model:Destroy()
+                Coin.followPart:Destroy()
+                table.remove(CoinTable, Index)
+                CoinEvent:FireServer(Coin.id)
+            end
+            task.wait()
         end
-        task.wait()
-    end
-end)
+    end)
+end
+
 
 Shared.Missions.MissionFinished.OnClientEvent:Once(function()
     GetMissionChest:InvokeServer()
@@ -88,45 +88,37 @@ Shared.Missions.MissionFinished.OnClientEvent:Once(function()
     GetMissionChest:InvokeServer()
     task.wait(1)
     Shared:WaitForChild('Teleport'):WaitForChild('StartRaid'):FireServer(DungeonID, DifficultyID)
+    print('Restarting Dungeon')
 end)
-print('Checkpoint 2')
 local Start = game:GetService("Workspace").MissionObjects:WaitForChild('MissionStart', 120)
 local OldPos
 if Start then
-    print('Checkpoint 3 (Final)')
+    print('Starting Dungeon')
     OldPos = HumanoidRootPart.Position
     HumanoidRootPart.CFrame = CFrame.new(Start.PrimaryPart.Position)
 end
 if DungeonID == 22 then
-task.spawn(function()
- local Fountain 
- local ArenaEntry = MissionObjects:WaitForChild('ArenaEntry0')
- ArenaEntry.Anchored = true
- ArenaEntry.CanCollide = false
- 
-
-  
-
- 
-  while task.wait() do
-   if     workspace:FindFirstChild('CureFountainFallenKing') and Fountain == nil then
-   Fountain = true
-   local count = 0
-   print('Teleporting to cure')
-   while task.wait(0.1) do
-   count += 1
-   HumanoidRootPart.CFrame = CFrame.new(workspace.CureFountainFallenKing.PrimaryPart.Position)
-   if count == 30 then
-   break end
-   end
-   else
-   ArenaEntry.CFrame = CFrame.new(HumanoidRootPart.Position)
-   task.wait(0.5)
-  ArenaEntry.CFrame = CFrame.new(Vector3.new(0,0,0))
-  task.wait(0.5)
-  end
-  
-  end
-  
-end)
+    task.spawn(function()
+        local Fountain 
+        local ArenaEntry = MissionObjects:WaitForChild('ArenaEntry0')
+        ArenaEntry.Anchored = true
+        ArenaEntry.CanCollide = false
+        while task.wait() do
+            if workspace:FindFirstChild('CureFountainFallenKing') and Fountain == nil then
+                Fountain = true
+                local count = 0
+                print('Teleporting to cure')
+                while task.wait(0.1) do
+                    count += 1
+                    HumanoidRootPart.CFrame = CFrame.new(workspace.CureFountainFallenKing.PrimaryPart.Position)
+                    if count == 30 then break end
+                end
+            else
+                ArenaEntry.CFrame = CFrame.new(HumanoidRootPart.Position)
+                task.wait(0.5)
+                ArenaEntry.CFrame = CFrame.new(Vector3.new(0,0,0))
+                task.wait(0.5)
+            end
+        end
+    end)
 end
