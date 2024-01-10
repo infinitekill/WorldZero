@@ -4,7 +4,7 @@ end
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
-print('Version 6 (EmulatorBullshit)')
+print('Version 7 (EmulatorBullshit)')
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
 local Shared = ReplicatedStorage.Shared
 local Players = game:GetService('Players')
@@ -67,6 +67,18 @@ if DungeonID then
             task.wait()
         end
     end)
+
+    task.spawn(function()
+        while true do
+            for i,v in pairs(MissionObjects:GetDescendants()) do
+                if v.Name == 'HealthProperties' then
+                    v.Parent.Parent = Mobs
+                end
+            end 
+            task.wait(1)
+        end 
+    end)
+    
     task.spawn(function()
         while true do
             for Index, Coin in pairs(CoinTable) do
@@ -87,8 +99,13 @@ Shared.Missions.MissionFinished.OnClientEvent:Once(function()
     GetMissionChest:InvokeServer()
     GetMissionChest:InvokeServer()
     task.wait(1)
-    Shared:WaitForChild('Teleport'):WaitForChild('StartRaid'):FireServer(DungeonID, DifficultyID)
     print('Restarting Dungeon')
+    task.spawn(function()
+        while true do
+            Shared:WaitForChild('Teleport'):WaitForChild('StartRaid'):FireServer(DungeonID, DifficultyID)
+            task.wait(0.5)
+        end
+    end)
 end)
 local Start = game:GetService("Workspace").MissionObjects:WaitForChild('MissionStart', 120)
 local OldPos
