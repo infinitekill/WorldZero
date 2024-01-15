@@ -4,9 +4,9 @@ end
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
-print('Version 7 (EmulatorBullshit)')
+print('Version 8 (EmulatorBullshit)')
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
-local Shared = ReplicatedStorage.Shared
+local Shared = ReplicatedStorage:WaitForChild('Shared')
 local Players = game:GetService('Players')
 local LocalPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal('LocalPlayer'):Wait() or Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait() or LocalPlayer.Character
