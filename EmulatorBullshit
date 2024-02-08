@@ -107,7 +107,8 @@ Shared.Missions.MissionFinished.OnClientEvent:Once(function()
         end
     end)
 end)
-local Start = game:GetService("Workspace").MissionObjects:WaitForChild('MissionStart', 120)
+
+local Start = game:GetService("Workspace").MissionObjects:WaitForChild('MissionStart', 5)
 local OldPos
 if Start then
     print('Starting Dungeon')
@@ -136,6 +137,20 @@ if DungeonID == 22 then
                 ArenaEntry.CFrame = CFrame.new(Vector3.new(0,0,0))
                 task.wait(0.5)
             end
+        end
+    end)
+end
+print(InInfiniteTower)
+if InInfiniteTower then
+    local FloorPart = game:GetService("Workspace").LobbyTeleport.Interaction
+    local BossPart = game:GetService("Workspace").Boss_Gate.Interactions.Bounds
+    print('hi')
+    task.spawn(function() 
+        while true do
+            BossPart.CanCollide = false
+            BossPart.CFrame = CFrame.new(HumanoidRootPart.Position)
+            FloorPart.CFrame = CFrame.new(HumanoidRootPart.Position)
+            task.wait(0.2)
         end
     end)
 end
