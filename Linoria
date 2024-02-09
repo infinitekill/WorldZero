@@ -29,7 +29,7 @@ local MissionObjects
 local MissionScripts
 local DungeonID
 local DifficultyID = nil
-local Towers = {21,23,27,29,34}
+local Towers = {21,23,27,29,34,43}
 local InMission = false
 local InDungeon = false
 local InAtlantis = false
@@ -181,7 +181,7 @@ local WorldData = {
     World7 = { Name = 'World 7', Id = 40, OrderId = 7 },
     World8 = { Name = 'World 8', Id = 45, OrderId = 8 },
     World9 = { Name = 'World 9', Id = 49, OrderId = 9 },
-    --World10 = { Name = 'World 10', Id = 56, OrderId = 10},
+    World10 = { Name = 'World 10', Id = 56, OrderId = 10},
     TradingHub = { Name = 'Cliffside Marketplace', Id = 44, OrderId = 11 },
     PvpArena = { Name = 'Pvp Arena', Id = 39, OrderId = 12 },
     Baseplate = { Name = 'Baseplate', Id = 26, OrderId = 13 },
@@ -239,11 +239,17 @@ local DungeonData = {
 	{ Id = 33, Name = "Aether Fortress", World = 9, Code = '9-2' },
 	{ Id = 34, Name = "Aether Tower", World = 9, Code = 'Tower 5' },
 
+    --World 10--
+	{ Id = 41, Name = "Crystal Chaos", World = 10, Code = '10-1' },
+	{ Id = 42, Name = "Astral Academy", World = 10, Code = '10-2' },
+	{ Id = 43, Name = "Arcane Tower", World = 10, Code = 'Tower 6' },
+
 	--Special--
 	{ Id = 22, Name = "Haunted Event", World = "Spooky Courtyard" },
 	{ Id = 17, Name = "Klaus Factory", World = "Holiday Village" },
     { Id = 38, Name = "Infinite Tower" },
     { Id = 39, Name = "Celestial Tower" },
+    { Id = 40, Name = "Daily Dungeon" },
 }
 
 local ClassData = {
@@ -777,7 +783,7 @@ local OutfitList = Tabs.Outfits:AddLeftGroupbox('Outfits')
 do
     Farming:AddToggle('Killaura', {
         Text = 'Killaura',
-        Default = false, -- Default value (true / false)
+        Default = true, -- Default value (true / false)
     })
     Farming:AddSlider('KillauraDelay', {
         Text = 'Delay',
@@ -799,7 +805,7 @@ do
 
     Farming:AddToggle('Autofarm', {
         Text = 'Autofarm',
-        Default = false, -- Default value (true / false)
+        Default = true, -- Default value (true / false)
         -- Tooltip = '', -- Information shown when you hover over the toggle
     })
 
@@ -820,12 +826,12 @@ do
 
     Farming:AddToggle('CollectDrops', {
         Text = 'Collect Drops',
-        Default = false, -- Default value (true / false)
+        Default = true, -- Default value (true / false)
     })
 
     Farming:AddSlider('FastSprint', {
         Text = 'Sprint Speed',
-        Default = 28,
+        Default = 100,
         Min = 28,
         Max = 200,
         Rounding = 0,
@@ -852,19 +858,19 @@ end
 do
     AutoSell:AddToggle('Tier1', {
         Text = 'Tier 1',
-        Default = false, -- Default value (true / false)
+        Default = true, -- Default value (true / false)
     })
     AutoSell:AddToggle('Tier2', {
         Text = 'Tier 2',
-        Default = false, -- Default value (true / false)
+        Default = true, -- Default value (true / false)
     })
     AutoSell:AddToggle('Tier3', {
         Text = 'Tier 3',
-        Default = false, -- Default value (true / false)
+        Default = true, -- Default value (true / false)
     })
     AutoSell:AddToggle('Tier4', {
         Text = 'Tier 4',
-        Default = false, -- Default value (true / false)
+        Default = true, -- Default value (true / false)
     })
     AutoSell:AddToggle('Tier5', {
         Text = 'Tier 5',
@@ -920,7 +926,7 @@ do
                     for i,v in pairs(AutoSellTbl) do
                         if tier:GetItemTier(c) == v then
                             c:WaitForChild('Level')
-                            print('Sold a Lvl ' .. c.Level.Value .. ' T' .. tier:GetItemTier(c) .. ' ' .. drop.DisplayKey)
+                            --print('Sold a Lvl ' .. c.Level.Value .. ' T' .. tier:GetItemTier(c) .. ' ' .. drop.DisplayKey)
                             sell(c)
                             if Toggles.RestartDungeon.Value and Toggles.Autofarm.Value then
                                 StartRaid(DungeonID, DifficultyID)
@@ -946,7 +952,7 @@ do
                 for i,v in pairs(AutoSellTbl) do
                     if tier:GetItemTier(c) == v then
                         c:WaitForChild('Level')
-                        print('Sold a Lvl ' .. c.Level.Value .. ' T' .. tier:GetItemTier(c) .. ' ' .. drop.DisplayKey)
+                        --print('Sold a Lvl ' .. c.Level.Value .. ' T' .. tier:GetItemTier(c) .. ' ' .. drop.DisplayKey)
                         sell(c)
                     end
                 end
@@ -970,7 +976,7 @@ do
 
     Miscellaneous:AddToggle('NVD', {
         Text = 'No Visual Damage',
-        Default = false, -- Default value (true / false)
+        Default = true, -- Default value (true / false)
     })
 
     local UpgradeItems = Miscellaneous:AddButton({
