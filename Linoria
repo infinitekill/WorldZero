@@ -1487,7 +1487,7 @@ do
             end)
         end
         
-        if InTower or DungeonID == 38 then
+        if InTower or DungeonID == 39 then
             Workspace.ChildAdded:Connect(function(c)
                 if Toggles.Autofarm.Value then
                     if c.Name == 'RaidChestSilver' then
