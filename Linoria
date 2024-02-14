@@ -1448,24 +1448,7 @@ if DamageDebug then
     end)
 end
 
--- Restart Dungeon
-if InDungeon then
-    Shared.Missions.MissionFinished.OnClientEvent:Once(function()
-        task.wait(1.5)
-        if Toggles.RestartDungeon.Value and Toggles.Autofarm.Value then
-            StartRaid(DungeonID, DifficultyID)
-        end
-    end)
-elseif InTower then
-    TowerEnd:GetPropertyChangedSignal('Text'):Once(function()
-        task.wait(12)
-        if Toggles.RestartDungeon.Value and Toggles.Autofarm.Value then
-            StartRaid(DungeonID, DifficultyID)
-        end
-    end)
-end
-
--- Dungeon fixer
+-- Dungeon fixer and restart and nextdungeon
 do
     if InMission then
         if MissionScripts:FindFirstChild(6) then
@@ -1504,7 +1487,7 @@ do
             end)
         end
         
-        if InTower then
+        if InTower or DungeonID == 38 then
             Workspace.ChildAdded:Connect(function(c)
                 if Toggles.Autofarm.Value then
                     if c.Name == 'RaidChestSilver' then
