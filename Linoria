@@ -1024,7 +1024,7 @@ do
                 GetMissionChest:InvokeServer()
                 GetMissionChest:InvokeServer()
             end
-            task.wait(5)
+            task.wait(3.5)
             if Toggles.RestartDungeon.Value and Toggles.Autofarm.Value then
                 StartRaid(DungeonID, DifficultyID)
             elseif NextDungeon and Toggles.Autofarm.Value then
@@ -1600,7 +1600,7 @@ Toggles.Autofarm:OnChanged(function()
             end)
             local IgnoringMobs = false
             for i,v in pairs(mobIgnoreTbl) do
-                if DungeonID == v.Id then
+                if MissionScripts:FindFirstChild(v.Id) then
                     IgnoringMobs = true
                     MobTeleportIgnore(v.ignoreMob)
                 end
