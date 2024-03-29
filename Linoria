@@ -290,7 +290,7 @@ local DungeonData = {
 	{ Id = 11, Name = "Temple of Ruin", World = 2, Code = '2-1' },
 	{ Id = 12, Name = "Mama Trauma", World = 2, Code = '2-2' },
 	{ Id = 13, Name = "Volcano's Shadow", World = 2, Code = '2-3' },
-	{ Id = 7, Name = "Volcano Dungeon", World = 2, Code = '2-4' },
+	{ Id = 7, Name = "Volcano Dungeon", World = 2, Code = '2-4', MobCount = 63 },
 	
 	--World 3--
 	{ Id = 14, Name = "Mountain Pass", World = 3, Code = '3-1' },
@@ -298,13 +298,13 @@ local DungeonData = {
 	{ Id = 16, Name = "Winter Dungeon", World = 3, Code = '3-3' },
 	
 	--World 4--
-	{ Id = 20, Name = "Scrap Canyon", World = 4, Code = '4-1' },
+	{ Id = 20, Name = "Scrap Canyon", World = 4, Code = '4-1', MobCount = 58 },
 	{ Id = 19, Name = "Deserted Burrowmine", World = 4, Code = '4-2' },
 	{ Id = 18, Name = "Pyramid Dungeon", World = 4, Code = '4-3' },
 
 	--World 5--
 	{ Id = 24, Name = "Konoh Heartlands", World = 5, Code = '5-1' },
-	{ Id = 35, Name = "Konoh Inferno", World = 5, Code = '5-2' },
+	{ Id = 35, Name = "Konoh Inferno", World = 5, Code = '5-2', MobCount = 44 },
 	{ Id = 21, Name = "Prison Tower", World = 5, Code = 'Tower 1' }, --:omegalul:
 
 	--World 6--
@@ -324,7 +324,7 @@ local DungeonData = {
 
 	--World 9--
 	{ Id = 32, Name = "Treetop Trouble", World = 9, Code = '9-1' },
-	{ Id = 33, Name = "Aether Fortress", World = 9, Code = '9-2' },
+	{ Id = 33, Name = "Aether Fortress", World = 9, Code = '9-2', MobCount = 39 },
 	{ Id = 34, Name = "Aether Tower", World = 9, Code = 'Tower 5' },
 
     --World 10--
@@ -650,7 +650,7 @@ local ClassData = {
             { Skill = 'CrossSlash8', Cooldown = 8.2, Type = 'Ranged', Range = 47 },
             { Skill = 'CrossSlash9', Cooldown = 8.2, Type = 'Ranged', Range = 47 },
             { Skill = 'CrossSlash10', Cooldown = 8.2, Type = 'Ranged', Range = 47 },
-            --{ Skill = Skillsets:WaitForChild('DualWielder'):WaitForChild('Ultimate'), Cooldown = 30, Type = 'Remote' },
+            { Skill = Skillsets:WaitForChild('DualWielder'):WaitForChild('Ultimate'), Cooldown = 31, Type = 'Remote' },
             { Skill = 'DualWieldUltimateHit1', Cooldown = 31 },
             { Skill = 'DualWieldUltimateHit2', Cooldown = 31 },
             { Skill = 'DualWieldUltimateHit3', Cooldown = 31 },
@@ -822,6 +822,41 @@ local ClassData = {
             { Skill = Skillsets:WaitForChild('Summoner'):WaitForChild('Summon'), Cooldown = 0.5, Type = 'Remote' },
             --{ Skill = Skillsets:WaitForChild('Summoner'):WaitForChild('ExplodeSummons'), Cooldown = 0, Type = 'Remote' },
             { Skill = Skillsets:WaitForChild('Summoner'):WaitForChild('Ultimate'), Cooldown = 1, Type = 'Remote' },
+        }
+    },
+
+    Necromancer = {
+        Range = 14,
+        Type = 'Melee',
+        Primary = 'Scythe',
+        Skills = {
+            { Skill = 'NecroDPS1', Cooldown = 0.8 },
+            { Skill = 'NecroDPS2', Cooldown = 1.2 },
+            { Skill = 'NecroDPS3', Cooldown = 1.5 },
+            { Skill = 'NecroDPS4', Cooldown = 1.9 },
+            { Skill = 'NecroDPS5', Cooldown = 2.2 },
+            { Skill = 'NecroDPS6', Cooldown = 2.5 },
+            { Skill = 'NecroDPS7', Cooldown = 2.8 },
+            { Skill = 'NecroDPS8', Cooldown = 3.2 },
+            { Skill = 'NecroDPS9', Cooldown = 3.5 },
+            { Skill = 'SpiritExplosion0', Cooldown = 2.25, Range = 17, Args = 'HrpPos' },
+            { Skill = 'SpiritExplosion1', Cooldown = 2.25, Range = 17, Args = 'HrpPos' },
+            { Skill = 'SpiritExplosion2', Cooldown = 3, Range = 18, Args = 'HrpPos' },
+            { Skill = 'SpiritExplosion3', Cooldown = 3.25, Range = 21, Args = 'HrpPos' },
+            { Skill = 'SpiritExplosion4', Cooldown = 4, Range = 24, Args = 'HrpPos' },
+            { Skill = 'TombstoneRise1', Cooldown = 4.2, Range = 18 },
+            { Skill = 'TombstoneRise2', Cooldown = 4.2, Range = 18 },
+            { Skill = 'TombstoneRise3', Cooldown = 4.2, Range = 18 },
+            { Skill = 'TombstoneRise4', Cooldown = 4.2, Range = 18 },
+            { Skill = 'TombstoneRise5', Cooldown = 4.2, Range = 18 },
+            { Skill = 'SpiritCavern1', Cooldown = 10.2, Range = 140, Args = 'MobPosition' },
+            { Skill = 'SpiritCavern2', Cooldown = 10.2, Range = 140, Args = 'MobPosition' },
+            { Skill = 'SpiritCavern3', Cooldown = 10.2, Range = 140, Args = 'MobPosition' },
+            { Skill = 'SpiritCavern4', Cooldown = 10.2, Range = 140, Args = 'MobPosition' },
+            { Skill = 'SpiritCavern5', Cooldown = 10.2, Range = 140, Args = 'MobPosition' },
+            { Skill = 'SpiritCavern6', Cooldown = 10.2, Range = 140, Args = 'MobPosition' },
+            { Skill = 'UltScytheDrop', Cooldown = 27, Range = 98, Args = 'MobPosition' },
+            { Skill = Skillsets:WaitForChild('Necromancer'):WaitForChild('Ultimate'), Cooldown = 31, Type = 'Remote' },
         }
     }
 }   
@@ -1887,8 +1922,16 @@ Toggles.Killaura:OnChanged(function()
                     if tick() - (SkillData.LastUsed or 0) >= SkillCooldown  then
                         if SkillType == 'Melee' and (BestMob.Position-HumanoidRootPart.Position).magnitude <= SkillRange
                         and BestMob.Parent.HealthProperties.Health.Value > 0 then
-                            Attack:FireServer(SkillData.Skill, HumanoidRootPart.Position, CFrame.new(HumanoidRootPart.Position, BestMob.Position).LookVector)
-                            SkillData.LastUsed = tick()
+                            if SkillData.Args == 'HrpPos' then
+                                Attack:FireServer(SkillData.Skill, HumanoidRootPart.Position)
+                                SkillData.LastUsed = tick()
+                            elseif SkillData.Args == 'MobPosition' then
+                                Attack:FireServer(SkillData.Skill, BestMob.Position)
+                                SkillData.LastUsed = tick()
+                            else
+                                Attack:FireServer(SkillData.Skill, HumanoidRootPart.Position, CFrame.new(HumanoidRootPart.Position, BestMob.Position).LookVector)
+                                SkillData.LastUsed = tick()
+                            end
                         elseif SkillType == 'Ranged' and (BestMob.Position-HumanoidRootPart.Position).magnitude <= SkillRange
                         and BestMob.Parent.HealthProperties.Health.Value > 0 then
                             Attack:FireServer(SkillData.Skill, BestMob.Position)
