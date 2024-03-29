@@ -1592,7 +1592,7 @@ Toggles.Autofarm:OnChanged(function()
             task.spawn(function()
                 repeat wait() until MissionStarted
                 if DungeonID == 14 then
-                    task.wait(4)
+                    task.wait(6)
                     AutoCheckpoint()
                 else
                     AutoCheckpoint()
