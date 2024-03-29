@@ -4,7 +4,7 @@ end
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
---local NextDungeon = true
+--local NextDungeon = false
 --local RestartDungeon = true
 local DamageDebug = false -- DamageDebug
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -1281,7 +1281,7 @@ do
     function AutoCheckpoint()
         task.spawn(function()
             while Toggles.Autofarm.Value do
-                for i,v in pairs(game:GetDescendants()) do
+                for i,v in pairs(workspace:GetDescendants()) do
                     if v.Name == "TouchInterest" and v.Parent and (table.find(checkpointTbl, v.Parent.Name) or table.find(checkpointTbl, v.Parent.Parent.Name)) then
                         v.Parent.CanCollide = false
                         v.Parent.CFrame = CFrame.new(HumanoidRootPart.Position)
