@@ -1167,6 +1167,23 @@ do
         end,
         DoubleClick = false
     })
+
+    local DisableAnticheat = Miscellaneous:AddButton({
+        Text = 'Disable Anti-TP',
+        Func = function()
+            if not InMission then
+                ReplicatedStorage.Remotes.SetMounted:FireServer(true)
+                wait(1)
+                Shared.Teleport.WaystoneTeleport:FireServer(1)
+                wait(0.5)
+                ReplicatedStorage.Remotes.SetMounted:FireServer(false)
+                require(ReplicatedStorage.Client.Gui):Get("Waystones"):Close();
+                
+                
+            end
+        end,
+        DoubleClick = false
+    })
 end
 
 -- Gui
@@ -2147,7 +2164,7 @@ end)
 local MenuGroup = Tabs['Settings']:AddLeftGroupbox('Menu')
 
 MenuGroup:AddButton('Unload', function() Library:Unload() end)
-MenuGroup:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'End', NoUI = false, Text = 'Menu keybind' })
+MenuGroup:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'RightShift', NoUI = false, Text = 'Menu keybind' })
 
 Library.ToggleKeybind = Options.MenuKeybind -- Allows you to have a custom keybind for the menu
 
