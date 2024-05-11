@@ -4,8 +4,6 @@ end
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
---local NextDungeon = false
---local RestartDungeon = true
 local DamageDebug = false -- DamageDebug
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild('Shared')
@@ -14,6 +12,7 @@ local SafePart
 local SafeZone
 local Players = game:GetService('Players')
 local LocalPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal('LocalPlayer'):Wait() or Players.LocalPlayer
+local ownsDoubleDrop = game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId, 8136250)
 local VirtualUser = game:GetService('VirtualUser')
 LocalPlayer.Idled:Connect(function()
     VirtualUser:CaptureController()
@@ -32,6 +31,9 @@ local KickTbl = {
 if game.PlaceId ~= WorldZeroID then
     KickTbl.CharacterID = ReplicatedStorage:WaitForChild('Profiles'):WaitForChild(PlayerName):WaitForChild('GUID').Value
 end  
+local Gold = ReplicatedStorage:WaitForChild('Profiles'):WaitForChild(PlayerName):WaitForChild('Currency'):WaitForChild('Gold')
+local OldGold = ReplicatedStorage:WaitForChild('Profiles'):WaitForChild(PlayerName):WaitForChild('Currency'):WaitForChild('Gold').Value
+local NewGold = ReplicatedStorage:WaitForChild('Profiles'):WaitForChild(PlayerName):WaitForChild('Currency'):WaitForChild('Gold').Value
 local MissionObjects
 local MissionScripts
 local DungeonID
@@ -134,6 +136,7 @@ local MobCount
 local MobCountNum
 local ChestWait = 1
 local ChestName = 'RaidChestSilver'
+local ChestName2 = 'RaidChestGold'
 local AtlantisBossCheck = false
 local Attack = Shared:WaitForChild("Combat"):WaitForChild("Attack")   
 local Mobs = game:GetService("Workspace"):FindFirstChild("Mobs")
@@ -896,6 +899,8 @@ local Farming = Tabs.Main:AddLeftGroupbox('Farming')
 local AutoSell = Tabs.Main:AddLeftGroupbox('Auto Sell')
 local Miscellaneous = Tabs.Main:AddRightGroupbox('Miscellaneous')
 local Gui = Tabs.Main:AddRightGroupbox('Gui')
+local StatsTabbox = Tabs.Main:AddRightTabbox('temp')
+local StatsTab = StatsTabbox:AddTab('Stats')
 local Worlds = Tabs.Teleports:AddLeftGroupbox('Worlds')
 local TowerTeleports = Tabs.Teleports:AddRightGroupbox('Towers')
 local NightmareDungeons = Tabs.Teleports:AddRightGroupbox('Nightmare Dungeons')
@@ -906,7 +911,7 @@ local OutfitList = Tabs.Outfits:AddLeftGroupbox('Outfits')
 do
     Farming:AddToggle('Killaura', {
         Text = 'Killaura',
-        Default = true, -- Default value (true / false)
+        Default = false, -- Default value (true / false)
     })
     Farming:AddSlider('KillauraDelay', {
         Text = 'Delay',
@@ -928,7 +933,7 @@ do
 
     Farming:AddToggle('Autofarm', {
         Text = 'Autofarm',
-        Default = true, -- Default value (true / false)
+        Default = false, -- Default value (true / false)
         -- Tooltip = '', -- Information shown when you hover over the toggle
     })
 
@@ -944,12 +949,17 @@ do
 
     Farming:AddToggle('RestartDungeon', {
         Text = 'Restart Dungeon',
-        Default = RestartDungeon, -- Default value (true / false)
+        Default = false, -- Default value (true / false)
+    })
+
+    Farming:AddToggle('NextDungeon', {
+        Text = 'Next Dungeon',
+        Default = false, -- Default value (true / false)
     })
 
     Farming:AddToggle('CollectDrops', {
         Text = 'Collect Drops',
-        Default = true, -- Default value (true / false)
+        Default = false, -- Default value (true / false)
     })
 
     Farming:AddSlider('FastSprint', {
@@ -981,19 +991,19 @@ end
 do
     AutoSell:AddToggle('Tier1', {
         Text = 'Tier 1',
-        Default = true, -- Default value (true / false)
+        Default = false, -- Default value (true / false)
     })
     AutoSell:AddToggle('Tier2', {
         Text = 'Tier 2',
-        Default = true, -- Default value (true / false)
+        Default = false, -- Default value (true / false)
     })
     AutoSell:AddToggle('Tier3', {
         Text = 'Tier 3',
-        Default = true, -- Default value (true / false)
+        Default = false, -- Default value (true / false)
     })
     AutoSell:AddToggle('Tier4', {
         Text = 'Tier 4',
-        Default = true, -- Default value (true / false)
+        Default = false, -- Default value (true / false)
     })
     AutoSell:AddToggle('Tier5', {
         Text = 'Tier 5',
@@ -1062,8 +1072,8 @@ do
             task.wait(3.5)
             if Toggles.RestartDungeon.Value and Toggles.Autofarm.Value then
                 StartRaid(DungeonID, DifficultyID)
-            elseif NextDungeon and Toggles.Autofarm.Value then
-                if not RestartDungeon then
+            elseif Toggles.NextDungeon.Value and Toggles.Autofarm.Value then
+                if not Toggles.RestartDungeon.Value then
                     local skip = true
                     local tower = false
                     if DungeonID == 38 then
@@ -1097,13 +1107,14 @@ do
             local drop = items[c.Name]
             if drop.Type == 'Weapon' or drop.Type == 'Armor' then
                 task.spawn(function()
-                    task.wait(1)
+                    task.wait(2)
                     require(game:GetService("ReplicatedStorage").Client.Gui):Get("LootReceived"):_Close()
                     game:GetService("Players").LocalPlayer.PlayerGui.LootReceived.LootReceived.Visible = false
                 end)
                 for i,v in pairs(AutoSellTbl) do
                     if tier:GetItemTier(c) == v then
                         c:WaitForChild('Level')
+                        task.wait(2)
                         --print('Sold a Lvl ' .. c.Level.Value .. ' T' .. tier:GetItemTier(c) .. ' ' .. drop.DisplayKey)
                         sell(c)
                     end
@@ -1128,7 +1139,7 @@ do
 
     Miscellaneous:AddToggle('NVD', {
         Text = 'No Visual Damage',
-        Default = true, -- Default value (true / false)
+        Default = false, -- Default value (true / false)
     })
 
     local UpgradeItems = Miscellaneous:AddButton({
@@ -1221,6 +1232,51 @@ do
             end
         end
     end
+end
+
+-- Stats Tab
+do
+    local goldGainedText = StatsTab:AddLabel('Gold Gained: ' .. Gold.Value-OldGold)
+    local goldRateText = StatsTab:AddLabel('Gold Rate: N/A')
+    local firstTime = true
+    local goldRateTick
+    local goldRateGold
+    local startGoldTimer = false
+    local totalGoldText = StatsTab:AddLabel('Total Gold: ' .. Gold.Value)
+    local goldTimeElapsedText = StatsTab:AddLabel('Time Elapsed: 0h 0m 0s')
+    local function timeElapsed(v)
+        local h = math.floor(v / 3600)
+        local m = math.floor((v % 3600) / 60)
+        local s = math.floor((v % 60))
+        return (h .. 'h ' .. m .. 'm ' .. s .. 's')
+    end
+    task.spawn(function()
+        while true do
+            if Gold.Value ~= NewGold then
+                NewGold = Gold.Value
+                if not firstTime then
+                    goldRateText:SetText('Gold Rate: ' .. math.floor((NewGold-goldRateGold)/(tick()-goldRateTick)*600)/10 .. '/min')
+                end
+                if firstTime then
+                    firstTime = false
+                    startGoldTimer = true
+                    goldRateTick = tick()
+                    goldRateGold = NewGold
+                end
+                goldGainedText:SetText('Gold Gained: ' .. NewGold-OldGold)
+                totalGoldText:SetText('Total Gold: ' .. NewGold)
+            end
+            task.wait()
+        end
+    end)
+    task.spawn(function()
+        repeat wait() until startGoldTimer
+        local goldTimeTick = tick()
+        while true do
+            task.wait(1)
+            goldTimeElapsedText:SetText('Time Elapsed: ' .. timeElapsed(tick()-goldTimeTick))
+        end
+    end)
 end
 
 -- Teleports
@@ -1542,9 +1598,23 @@ do
         if InTower or DungeonID == 39 then
             Workspace.ChildAdded:Connect(function(c)
                 if Toggles.Autofarm.Value then
-                    if c.Name == 'RaidChestSilver' then
-                        c.PrimaryPart.CanCollide = false
-                        c.PrimaryPart.CFrame = CFrame.new(HumanoidRootPart.Position)
+                    if c.Name == ChestName then
+                        task.spawn(function()
+                            c.PrimaryPart.CanCollide = false
+                            while c and c.PrimaryPart do
+                                c.PrimaryPart.CFrame = CFrame.new(HumanoidRootPart.Position)
+                                task.wait()
+                            end
+                        end)
+                    end
+                    if ownsDoubleDrop and c.Name == ChestName2 then
+                        task.spawn(function()
+                            c.PrimaryPart.CanCollide = false
+                            while c and c.PrimaryPart do
+                                c.PrimaryPart.CFrame = CFrame.new(HumanoidRootPart.Position)
+                                task.wait()
+                            end
+                        end)
                     end
                 end
             end)
@@ -1570,8 +1640,8 @@ do
                     else
                         StartRaid(DungeonID, DifficultyID)
                     end
-                elseif NextDungeon and Toggles.Autofarm.Value then
-                    if not RestartDungeon then
+                elseif Toggles.NextDungeon.Value and Toggles.Autofarm.Value then
+                    if not Toggles.RestartDungeon.Value then
                         local skip = true
                         local tower = false
                         if DungeonID == 38 then
@@ -1612,9 +1682,23 @@ do
             SafeZone = Workspace.SafeZone
             Workspace.ChildAdded:Connect(function(c)
                 if Toggles.Autofarm.Value then
-                    if c.Name == 'RaidChestSilver' then
-                        c.PrimaryPart.CanCollide = false
-                        c.PrimaryPart.CFrame = CFrame.new(HumanoidRootPart.Position)
+                    if c.Name == ChestName then
+                        task.spawn(function()
+                            c.PrimaryPart.CanCollide = false
+                            while c and c.PrimaryPart do
+                                c.PrimaryPart.CFrame = CFrame.new(HumanoidRootPart.Position)
+                                task.wait()
+                            end
+                        end)
+                    end
+                    if ownsDoubleDrop and c.Name == ChestName2 then
+                        task.spawn(function()
+                            c.PrimaryPart.CanCollide = false
+                            while c and c.PrimaryPart do
+                                c.PrimaryPart.CFrame = CFrame.new(HumanoidRootPart.Position)
+                                task.wait()
+                            end
+                        end)
                     end
                 end
             end)
