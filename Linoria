@@ -883,7 +883,7 @@ local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
 local Window = Library:CreateWindow({
     Title = 'World Zero',
     Center = false,
-    AutoShow = false,
+    AutoShow = true,
     TabPadding = 8,
     MenuFadeTime = 0
 })
