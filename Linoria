@@ -80,6 +80,13 @@ function load()
         KickTbl = http:JSONDecode(readfile(KickFilename))
     end
 end
+local function sendError(v1,v2,v3)
+    game.StarterGui:SetCore("SendNotification", {
+    Title = v3 or "Infinite";
+    Text = v1; 
+    Duration = v2 or 4; 
+    })
+end
 game:GetService("GuiService").ErrorMessageChanged:Once(function(msg)
     if game.GuiService:GetErrorCode() == Enum.ConnectionError.DisconnectLuaKick then
         if msg == 'Please do not exploit in World // Zero.' then
@@ -1012,37 +1019,37 @@ do
 
     Toggles.Tier1:OnChanged(function()
         if Toggles.Tier1.Value then
-            table.insert(AutoSellTbl, 1)
-        elseif not Toggles.Tier1.Value and table.find(AutoSellTbl, 1) then
-            table.remove(AutoSellTbl, 1)
+            table.insert(AutoSellTbl, '1')
+        elseif not Toggles.Tier1.Value and table.find(AutoSellTbl, '1') then
+            table.remove(AutoSellTbl, table.find(AutoSellTbl, '1'))
         end
     end)
     Toggles.Tier2:OnChanged(function()
         if Toggles.Tier2.Value then
-            table.insert(AutoSellTbl, 2)
-        elseif not Toggles.Tier2.Value and table.find(AutoSellTbl, 2) then
-            table.remove(AutoSellTbl, 2)
+            table.insert(AutoSellTbl, '2')
+        elseif not Toggles.Tier2.Value and table.find(AutoSellTbl, '2') then
+            table.remove(AutoSellTbl, table.find(AutoSellTbl, '2'))
         end
     end)
     Toggles.Tier3:OnChanged(function()
         if Toggles.Tier3.Value then
-            table.insert(AutoSellTbl, 3)
-        elseif not Toggles.Tier3.Value and table.find(AutoSellTbl, 3) then
-            table.remove(AutoSellTbl, 3)
+            table.insert(AutoSellTbl, '3')
+        elseif not Toggles.Tier3.Value and table.find(AutoSellTbl, '3') then
+            table.remove(AutoSellTbl, table.find(AutoSellTbl, '3'))
         end
     end)
     Toggles.Tier4:OnChanged(function()
         if Toggles.Tier4.Value then
-            table.insert(AutoSellTbl, 4)
-        elseif not Toggles.Tier4.Value and table.find(AutoSellTbl, 4) then
-            table.remove(AutoSellTbl, 4)
+            table.insert(AutoSellTbl, '4')
+        elseif not Toggles.Tier4.Value and table.find(AutoSellTbl, '4') then
+            table.remove(AutoSellTbl, table.find(AutoSellTbl, '4'))
         end
     end)
     Toggles.Tier5:OnChanged(function()
         if Toggles.Tier5.Value then
-            table.insert(AutoSellTbl, 5)
-        elseif not Toggles.Tier5.Value and table.find(AutoSellTbl, 5) then
-            table.remove(AutoSellTbl, 5)
+            table.insert(AutoSellTbl, '5')
+        elseif not Toggles.Tier5.Value and table.find(AutoSellTbl, '5') then
+            table.remove(AutoSellTbl, table.find(AutoSellTbl, '5'))
         end
     end)
      
@@ -1057,7 +1064,7 @@ do
                         game:GetService("Players").LocalPlayer.PlayerGui.LootReceived.LootReceived.Visible = false
                     end)
                     for i,v in pairs(AutoSellTbl) do
-                        if tier:GetItemTier(c) == v then
+                        if tier:GetItemTier(c) == tonumber(v) then
                             c:WaitForChild('Level')
                             print('Sold a Lvl ' .. c.Level.Value .. ' T' .. tier:GetItemTier(c) .. ' ' .. drop.DisplayKey)
                             sell(c)
@@ -1112,7 +1119,7 @@ do
                     game:GetService("Players").LocalPlayer.PlayerGui.LootReceived.LootReceived.Visible = false
                 end)
                 for i,v in pairs(AutoSellTbl) do
-                    if tier:GetItemTier(c) == v then
+                    if tier:GetItemTier(c) == tonumber(v) then
                         c:WaitForChild('Level')
                         task.wait(2)
                         --print('Sold a Lvl ' .. c.Level.Value .. ' T' .. tier:GetItemTier(c) .. ' ' .. drop.DisplayKey)
