@@ -881,7 +881,7 @@ local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))
 local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
 
 local Window = Library:CreateWindow({
-    Title = 'World Zero',
+    Title = 'Infinite | World Zero',
     Center = false,
     AutoShow = true,
     TabPadding = 8,
