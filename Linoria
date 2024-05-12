@@ -1356,7 +1356,7 @@ do
                 if BestMob then
                     PausePos = BestMob.Position + Vector3.new(0,10,0)
                 end
-                if PausePos and MobCount and MobCount == 0 and (HumanoidRootPart.Position-PausePos).magnitude > 200  then
+                if PausePos and MobCount and MobCount == 0 and (HumanoidRootPart.Position-PausePos).magnitude > 300  then
                     PlayerTp(PausePos)
                 end
                 Heartbeat:Wait()
