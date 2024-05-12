@@ -1352,11 +1352,11 @@ do
     
     function AntiFling()
         task.spawn(function()
-            while Toggles.Autofarm.Value and InDungeon do
+            while Toggles.Autofarm.Value do
                 if BestMob then
                     PausePos = BestMob.Position + Vector3.new(0,10,0)
                 end
-                if PausePos and MobCount and MobCount == 0 then
+                if PausePos and MobCount and MobCount == 0 and (HumanoidRootPart.Position-PausePos).magnitude > 200  then
                     PlayerTp(PausePos)
                 end
                 Heartbeat:Wait()
@@ -1711,7 +1711,8 @@ end
 
 Toggles.Autofarm:OnChanged(function()
 
-    if InMission then
+    if InMission and Toggles.Autofarm.Value then
+        print('antifling')
         AntiFling()
         MobCounter()
     end
@@ -1882,6 +1883,9 @@ Toggles.Autofarm:OnChanged(function()
     end
 
     if InInfiniteTower and Toggles.Autofarm.Value then
+        if Class ~= 'Demon' then
+            MobTeleport()
+        end
         local FloorPart = game:GetService("Workspace").LobbyTeleport.Interaction
         local BossPart = game:GetService("Workspace").Boss_Gate.Interactions.Bounds
         task.spawn(function() 
@@ -1889,10 +1893,7 @@ Toggles.Autofarm:OnChanged(function()
                 BossPart.CanCollide = false
                 BossPart.CFrame = CFrame.new(HumanoidRootPart.Position)
                 FloorPart.CFrame = CFrame.new(HumanoidRootPart.Position)
-                if (HumanoidRootPart.Position-SafeZone.Position).magnitude > 100 and TempCheck then
-                    PlayerTp(SafeZone.Position, 0 , 5, 0)
-                end
-                task.wait(0.2)
+                task.wait(0.5)
             end
         end)
     end
