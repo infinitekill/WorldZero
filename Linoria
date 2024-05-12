@@ -994,7 +994,7 @@ do
     })
 end
 
--- Auto Sell
+-- Auto Sell and some restart dungeon
 do
     AutoSell:AddToggle('Tier1', {
         Text = 'Tier 1',
@@ -1052,83 +1052,6 @@ do
             table.remove(AutoSellTbl, table.find(AutoSellTbl, '5'))
         end
     end)
-     
-    if InDungeon then
-        Shared.Missions.MissionFinished.OnClientEvent:Once(function()
-            Inventory.ChildAdded:Connect(function(c)
-                local drop = items[c.Name]
-                if drop.Type == 'Weapon' or drop.Type == 'Armor' then
-                    task.spawn(function()
-                        task.wait(1)
-                        require(game:GetService("ReplicatedStorage").Client.Gui):Get("LootReceived"):_Close()
-                        game:GetService("Players").LocalPlayer.PlayerGui.LootReceived.LootReceived.Visible = false
-                    end)
-                    for i,v in pairs(AutoSellTbl) do
-                        if tier:GetItemTier(c) == tonumber(v) then
-                            c:WaitForChild('Level')
-                            print('Sold a Lvl ' .. c.Level.Value .. ' T' .. tier:GetItemTier(c) .. ' ' .. drop.DisplayKey)
-                            sell(c)
-                        end
-                    end
-                end
-            end)
-            if Toggles.Autofarm.Value then
-                GetMissionChest:InvokeServer()
-                GetMissionChest:InvokeServer()
-            end
-            task.wait(3.5)
-            if Toggles.RestartDungeon.Value and Toggles.Autofarm.Value then
-                StartRaid(DungeonID, DifficultyID)
-            elseif Toggles.NextDungeon.Value and Toggles.Autofarm.Value then
-                if not Toggles.RestartDungeon.Value then
-                    local skip = true
-                    local tower = false
-                    if DungeonID == 38 then
-                        skip = false
-                    end
-                    if skip then
-                        if table.find(Towers2, nextDungeonTbl[table.find(nextDungeonTbl, DungeonID)+1]) then
-                            if DifficultyID == 5 then
-                                tower = true
-                            end
-                            if InTower or InInfiniteTower then
-                                tower = true
-                            end
-                        end
-                        if not tower then
-                            if InDungeon and DifficultyID == 1 then
-                                StartRaid(DungeonID, 5)
-                            else
-                                StartRaid(nextDungeonTbl[table.find(nextDungeonTbl, DungeonID)+1],1)
-                            end
-                        end
-                        if tower then
-                            StartRaid(nextDungeonTbl[table.find(nextDungeonTbl, DungeonID)+1])
-                        end
-                    end
-                end
-            end
-        end)
-    elseif InTower or InInfiniteTower then
-        Inventory.ChildAdded:Connect(function(c)
-            local drop = items[c.Name]
-            if drop.Type == 'Weapon' or drop.Type == 'Armor' then
-                task.spawn(function()
-                    task.wait(2)
-                    require(game:GetService("ReplicatedStorage").Client.Gui):Get("LootReceived"):_Close()
-                    game:GetService("Players").LocalPlayer.PlayerGui.LootReceived.LootReceived.Visible = false
-                end)
-                for i,v in pairs(AutoSellTbl) do
-                    if tier:GetItemTier(c) == tonumber(v) then
-                        c:WaitForChild('Level')
-                        task.wait(2)
-                        --print('Sold a Lvl ' .. c.Level.Value .. ' T' .. tier:GetItemTier(c) .. ' ' .. drop.DisplayKey)
-                        sell(c)
-                    end
-                end
-            end
-        end)
-    end
 end
 
 --  Miscellaneous
@@ -1563,10 +1486,10 @@ if DamageDebug then
     end)
 end
 
--- Dungeon fixer and restart and nextdungeon
+-- Dungeon fixer and restartdungeon and nextdungeon and autosell
 do
     if InMission then
-        if MissionScripts:FindFirstChild(6) then
+        if MissionScripts:FindFirstChild(6) then -- Gravetower move pillars to mob folder
             task.spawn(function()
                 local Pillar1, Pillar2, Pillar3 = Workspace:WaitForChild('Pillar1'), Workspace:WaitForChild('Pillar2'), Workspace:WaitForChild('Pillar3')
                 Pillar3:WaitForChild('HealthProperties')
@@ -1574,7 +1497,7 @@ do
                 Pillar2.Parent = Mobs
                 Pillar3.Parent = Mobs
             end)
-        elseif MissionScripts:FindFirstChild(23) then
+        elseif MissionScripts:FindFirstChild(23) then -- Atlantis Tower ignore kraken
             task.spawn(function()
                 Mobs:WaitForChild('BOSSKrakenMain')
                 ChestWait = 4
@@ -1585,7 +1508,7 @@ do
                 Mobs.BOSSKrakenMain.Parent = Workspace.WaterFolder
                 AtlantisBossCheck = true
             end)
-        elseif MissionScripts:FindFirstChild(30) then
+        elseif MissionScripts:FindFirstChild(30) then -- Ruin Rush ignore sentries
             local ignoreMobFolder = Instance.new('Folder')
             ignoreMobFolder.Name = 'IgnoreMobs'
             ignoreMobFolder.Parent = Workspace
@@ -1601,115 +1524,187 @@ do
                 end
             end)
         end
-        
-        if InTower or DungeonID == 39 then
-            Workspace.ChildAdded:Connect(function(c)
-                if Toggles.Autofarm.Value then
-                    if c.Name == ChestName then
-                        task.spawn(function()
-                            c.PrimaryPart.CanCollide = false
-                            while c and c.PrimaryPart do
-                                c.PrimaryPart.CFrame = CFrame.new(HumanoidRootPart.Position)
-                                task.wait()
-                            end
-                        end)
-                    end
-                    if ownsDoubleDrop and c.Name == ChestName2 then
-                        task.spawn(function()
-                            c.PrimaryPart.CanCollide = false
-                            while c and c.PrimaryPart do
-                                c.PrimaryPart.CFrame = CFrame.new(HumanoidRootPart.Position)
-                                task.wait()
-                            end
-                        end)
-                    end
-                end
-            end)
-            TowerEnd:GetPropertyChangedSignal("Text"):Once(function()
-                local TowerDing = false
-                task.spawn(function()
-                    while true do
-                        for i,v in pairs(Workspace:GetChildren()) do
-                            if v.Name == 'RaidChestSilver' or v.Name == 'RaidChestGold' then
-                                if Toggles.Autofarm.Value then
-                                    v.PrimaryPart.CanCollide = false
-                                    v.PrimaryPart.CFrame = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
-                                end
-                            end
-                        end
-                        task.wait()
-                    end
-                end)
-                task.wait(12)
-                if Toggles.RestartDungeon.Value and Toggles.Autofarm.Value then
-                    if table.find(Towers2, DungeonID) then
-                        StartRaid(DungeonID)
-                    else
-                        StartRaid(DungeonID, DifficultyID)
-                    end
-                elseif Toggles.NextDungeon.Value and Toggles.Autofarm.Value then
-                    if not Toggles.RestartDungeon.Value then
-                        local skip = true
-                        local tower = false
-                        if DungeonID == 38 then
-                            skip = false
-                        end
-                        if skip then
-                            if table.find(Towers2, nextDungeonTbl[table.find(nextDungeonTbl, DungeonID)+1]) then
-                                if DifficultyID == 5 then
-                                    tower = true
-                                end
-                                if InTower or InInfiniteTower then
-                                    tower = true
-                                end
-                            end
-                            if not tower then
-                                if InDungeon and DifficultyID == 1 then
-                                    StartRaid(DungeonID, 5)
-                                else
-                                    StartRaid(nextDungeonTbl[table.find(nextDungeonTbl, DungeonID)+1],1)
-                                end
-                            end
-                            if tower then
-                                StartRaid(nextDungeonTbl[table.find(nextDungeonTbl, DungeonID)+1])
-                            end
-                        end
-                    end
-                end
-            end)                
-        end
+    end
 
-        if InInfiniteTower then
-            SafePart = Instance.new('Part')
-            SafePart.Name = 'SafeZone'
-            SafePart.Size = Vector3.new(20,1,20)
-            SafePart.Position = Vector3.new(0,0,0)
-            SafePart.Anchored = true
-            SafePart.Parent = game.Workspace
-            SafeZone = Workspace.SafeZone
-            Workspace.ChildAdded:Connect(function(c)
-                if Toggles.Autofarm.Value then
-                    if c.Name == ChestName then
-                        task.spawn(function()
-                            c.PrimaryPart.CanCollide = false
-                            while c and c.PrimaryPart do
-                                c.PrimaryPart.CFrame = CFrame.new(HumanoidRootPart.Position)
-                                task.wait()
-                            end
-                        end)
-                    end
-                    if ownsDoubleDrop and c.Name == ChestName2 then
-                        task.spawn(function()
-                            c.PrimaryPart.CanCollide = false
-                            while c and c.PrimaryPart do
-                                c.PrimaryPart.CFrame = CFrame.new(HumanoidRootPart.Position)
-                                task.wait()
-                            end
-                        end)
+    if InDungeon then
+        Shared.Missions.MissionFinished.OnClientEvent:Once(function()
+            Inventory.ChildAdded:Connect(function(c)
+                local drop = items[c.Name]
+                if drop.Type == 'Weapon' or drop.Type == 'Armor' then
+                    for i,v in pairs(AutoSellTbl) do
+                        if tier:GetItemTier(c) == tonumber(v) then
+                            c:WaitForChild('Level')
+                            --print('Sold a Lvl ' .. c.Level.Value .. ' T' .. tier:GetItemTier(c) .. ' ' .. drop.DisplayKey)
+                            sell(c)
+                        end
                     end
                 end
             end)
-        end
+            if Toggles.Autofarm.Value then
+                GetMissionChest:InvokeServer()
+                GetMissionChest:InvokeServer()
+            end
+            task.wait(3)
+            if Toggles.RestartDungeon.Value and Toggles.Autofarm.Value then
+                StartRaid(DungeonID, DifficultyID)
+            elseif Toggles.NextDungeon.Value and Toggles.Autofarm.Value then
+                if not Toggles.RestartDungeon.Value then
+                    local skip = true
+                    local tower = false
+                    if DungeonID == 38 then
+                        skip = false
+                    end
+                    if skip then
+                        if table.find(Towers2, nextDungeonTbl[table.find(nextDungeonTbl, DungeonID)+1]) then
+                            if DifficultyID == 5 then
+                                tower = true
+                            end
+                            if InTower or InInfiniteTower then
+                                tower = true
+                            end
+                        end
+                        if not tower then
+                            if InDungeon and DifficultyID == 1 then
+                                StartRaid(DungeonID, 5)
+                            else
+                                StartRaid(nextDungeonTbl[table.find(nextDungeonTbl, DungeonID)+1],1)
+                            end
+                        end
+                        if tower then
+                            StartRaid(nextDungeonTbl[table.find(nextDungeonTbl, DungeonID)+1])
+                        end
+                    end
+                end
+            end
+        end)
+    end
+        
+    if InTower or InInfiniteTower then
+
+        -- Get Chests
+        Workspace.ChildAdded:Connect(function(c)
+            if Toggles.Autofarm.Value then
+                if c.Name == ChestName then
+                    task.spawn(function()
+                        c.PrimaryPart.CanCollide = false
+                        while c and c.PrimaryPart do
+                            c.PrimaryPart.CFrame = CFrame.new(HumanoidRootPart.Position)
+                            task.wait()
+                        end
+                    end)
+                end
+                if ownsDoubleDrop and c.Name == ChestName2 then
+                    task.spawn(function()
+                        c.PrimaryPart.CanCollide = false
+                        while c and c.PrimaryPart do
+                            c.PrimaryPart.CFrame = CFrame.new(HumanoidRootPart.Position)
+                            task.wait()
+                        end
+                    end)
+                end
+            end
+        end)
+
+        -- Restart Dungeon if fail
+        Shared.Missions.MissionFinished.OnClientEvent:Once(function()
+            task.wait(1)
+            if Toggles.RestartDungeon.Value and Toggles.Autofarm.Value then
+                if table.find(Towers2, DungeonID) then
+                    StartRaid(DungeonID)
+                else
+                    StartRaid(DungeonID, DifficultyID)
+                end
+            elseif Toggles.NextDungeon.Value and Toggles.Autofarm.Value then
+                if not Toggles.RestartDungeon.Value then
+                    local skip = true
+                    local tower = false
+                    if DungeonID == 38 then
+                        skip = false
+                    end
+                    if skip then
+                        if table.find(Towers2, nextDungeonTbl[table.find(nextDungeonTbl, DungeonID)+1]) then
+                            if DifficultyID == 5 then
+                                tower = true
+                            end
+                            if InTower or InInfiniteTower then
+                                tower = true
+                            end
+                        end
+                        if not tower then
+                            if InDungeon and DifficultyID == 1 then
+                                StartRaid(DungeonID, 5)
+                            else
+                                StartRaid(nextDungeonTbl[table.find(nextDungeonTbl, DungeonID)+1],1)
+                            end
+                        end
+                        if tower then
+                            StartRaid(nextDungeonTbl[table.find(nextDungeonTbl, DungeonID)+1])
+                        end
+                    end
+                end
+            end
+        end)
+
+        -- Restart dungeon if beaten (for towers and celestial, not infinite)
+        TowerEnd:GetPropertyChangedSignal("Text"):Once(function()
+            local TowerDing = false
+            task.wait(12)
+            if Toggles.RestartDungeon.Value and Toggles.Autofarm.Value then
+                if table.find(Towers2, DungeonID) then
+                    StartRaid(DungeonID)
+                else
+                    StartRaid(DungeonID, DifficultyID)
+                end
+            elseif Toggles.NextDungeon.Value and Toggles.Autofarm.Value then
+                if not Toggles.RestartDungeon.Value then
+                    local skip = true
+                    local tower = false
+                    if DungeonID == 38 then
+                        skip = false
+                    end
+                    if skip then
+                        if table.find(Towers2, nextDungeonTbl[table.find(nextDungeonTbl, DungeonID)+1]) then
+                            if DifficultyID == 5 then
+                                tower = true
+                            end
+                            if InTower or InInfiniteTower then
+                                tower = true
+                            end
+                        end
+                        if not tower then
+                            if InDungeon and DifficultyID == 1 then
+                                StartRaid(DungeonID, 5)
+                            else
+                                StartRaid(nextDungeonTbl[table.find(nextDungeonTbl, DungeonID)+1],1)
+                            end
+                        end
+                        if tower then
+                            StartRaid(nextDungeonTbl[table.find(nextDungeonTbl, DungeonID)+1])
+                        end
+                    end
+                end
+            end
+        end)   
+        
+        -- Autosell
+        Inventory.ChildAdded:Connect(function(c)
+            local drop = items[c.Name]
+            if drop.Type == 'Weapon' or drop.Type == 'Armor' then
+                task.spawn(function()
+                    task.wait(2)
+                    require(game:GetService("ReplicatedStorage").Client.Gui):Get("LootReceived"):_Close()
+                    game:GetService("Players").LocalPlayer.PlayerGui.LootReceived.LootReceived.Visible = false
+                end)
+                for i,v in pairs(AutoSellTbl) do
+                    if tier:GetItemTier(c) == tonumber(v) then
+                        c:WaitForChild('Level')
+                        task.wait(2)
+                        --print('Sold a Lvl ' .. c.Level.Value .. ' T' .. tier:GetItemTier(c) .. ' ' .. drop.DisplayKey)
+                        sell(c)
+                    end
+                end
+            end
+        end)
     end
 end
 
